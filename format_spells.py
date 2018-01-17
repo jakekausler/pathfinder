@@ -1129,36 +1129,37 @@ def ParseSpellLevels(arr, n):
     return ret
 
 
-with open('spelldb.csv', 'rb') as f:
-    reader = csv.reader(f, delimiter="\t")
-    reader.next()
-    i = 0
-    SpellDatabase = []
-    for row in reader:
-        ct = ParseCastingTime(row[5], row[0])
-        rec = {
-            'id': i+1,
-            'name': row[0],
-            'school': ParseSchool(row[1]),
-            'subschools': ParseSubSchools(row[2]),
-            'descriptors': ParseDescriptors(row[3]),
-            'casting_time': ct if ct else [0, config.NONE, config.NONE],
-            'components': ParseComponents(row[6]),
-            'costly_materials': int(row[7]) == 1,
-            'range': ParseRange(row[8]),
-            'area': ParseArea(row[9]),
-            'effects': ParseArea(row[10]),
-            'targets': ParseTargets(row[11]),
-            'duration': ParseDuration(row[12]),
-            'dismissable': int(row[13]) == 1,
-            'shapeable': int(row[14]) == 1,
-            'saving_throw': ParseSavingThrow(row[15]),
-            'spell_resistence': ParseSpellResistance(row[16]),
-            'description': (ParseDescription(row[17]), row[20]),
-            'source': ParseSource(row[19]),
-            'spell_levels': ParseSpellLevels(row[26:], row[0])
-        }
-        i += 1
-        SpellDatabase.append(rec)
-    with open('spells.json', 'w') as wf:
-        wf.write(json.dumps(SpellDatabase))
+def parse():
+    with open('spelldb.csv', 'rb') as f:
+        reader = csv.reader(f, delimiter="\t")
+        reader.next()
+        i = 0
+        SpellDatabase = []
+        for row in reader:
+            ct = ParseCastingTime(row[5], row[0])
+            rec = {
+                'id': i+1,
+                'name': row[0],
+                'school': ParseSchool(row[1]),
+                'subschools': ParseSubSchools(row[2]),
+                'descriptors': ParseDescriptors(row[3]),
+                'casting_time': ct if ct else [0, config.NONE, config.NONE],
+                'components': ParseComponents(row[6]),
+                'costly_materials': int(row[7]) == 1,
+                'range': ParseRange(row[8]),
+                'area': ParseArea(row[9]),
+                'effects': ParseArea(row[10]),
+                'targets': ParseTargets(row[11]),
+                'duration': ParseDuration(row[12]),
+                'dismissable': int(row[13]) == 1,
+                'shapeable': int(row[14]) == 1,
+                'saving_throw': ParseSavingThrow(row[15]),
+                'spell_resistence': ParseSpellResistance(row[16]),
+                'description': (ParseDescription(row[17]), row[20]),
+                'source': ParseSource(row[19]),
+                'spell_levels': ParseSpellLevels(row[26:], row[0])
+            }
+            i += 1
+            SpellDatabase.append(rec)
+        with open('spells.json', 'w') as wf:
+            wf.write(json.dumps(SpellDatabase))
