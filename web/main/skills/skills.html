@@ -1,0 +1,27 @@
+<span class="md-display-1">Skills</span><span ng-hide="character.SkillPointsLeft==0">(Can add {{character.SkillPointsLeft}} ranks)</span>
+<md-content layout-padding>
+	<md-table-container>
+		<table style="width: 100%">
+			 <thead>
+				<tr>
+					<th>
+						<span>Skill</span>
+					</th>
+					<th style='text-align: center'>
+						<span>Level</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="c in character.Skills" ng-click="showSkillDialog($event, $index)">
+					<td>
+						<span>{{c.Skill}}</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{c.Available ? c.Score : "N/A"}}</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</md-table-container>
+</md-content>

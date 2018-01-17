@@ -1,0 +1,75 @@
+<table style="width: 100%">
+	<thead>
+		<tr>
+			<th style='text-align: center'>
+				<span>Active</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Name</span>
+			</th>
+			<th style='text-align: center'>
+				<span>AC</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Skill Chk</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Max Dex</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Sp Fail</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Weight</span>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-click="showShieldDialog()">
+			<td style='text-align: center'>
+				<span>{{character.Armor.Armor == undefined ? "&nbsp;" : character.Armor.Active}}</span>
+			</td>
+			<td>
+				<span>{{character.Armor.Armor == undefined ? "&nbsp;" : character.Armor.Name}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Armor.Armor.AC}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Armor.Armor.SkillCheck}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Armor.Armor.MaxDexterity}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Armor.Armor.SpellFailure}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Armor.Armor.Weight}}</span>
+			</td>
+		</tr>
+		<tr ng-click="showArmorDialog()">
+			<td style='text-align: center'>
+				<span>{{character.Shield.Shield == undefined ? "&nbsp;" : character.Shield.Active}}</span>
+			</td>
+			<td>
+				<span>{{character.Shield.Shield == undefined ? "&nbsp;" : character.Shield.Shield.Name}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Shield.Shield.AC}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Shield.Shield.SkillCheck}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Shield.Shield.MaxDexterity}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Shield.Shield.SpellFailure}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{character.Shield.Shield.Weight}}</span>
+			</td>
+		</tr>
+	</tbody>
+</table>

@@ -1,0 +1,84 @@
+<div layout="column" flex layout-padding>
+	<md-tabs flex>
+		<md-tab ng-repeat="class in character.Classes" label="{{class.Class.Type}}" flex>
+			<md-content layout-padding flex>
+				<div ng-hide="characterSpells[class.Class.Type][i].length == 0" ng-repeat="i in getNumberArray(10)">
+					<div>
+						<span class="md-display-1">Level {{i}}</br></span>
+						<span>Can cast {{class.Class.SpellsPerDay[i] == -999999999 ? '∞' : class.Class.SpellsPerDay[i]}} more spells</br></span>
+						<span ng-show="class.Class.MustPrepare && class.Class.LeftToPrepare[i] > 0">Can prepare {{class.Class.LeftToPrepare[i] == -999999999 ? '∞' : class.Class.LeftToPrepare[i]}} more spells</br></span><span ng-show="class.Class.UseDomain && class.Class.LeftToPrepareDomain[i] > 0">Can prepare {{class.Class.LeftToPrepareDomain[i] == -999999999 ? '∞' : class.Class.LeftToPrepareDomain[i]}} more domain spells</br></span>
+						<span ng-show="!class.Class.MustPrepare && class.Class.LeftToLearn[i] > 0">Can learn {{class.Class.LeftToLearn[i] == -999999999 ? '∞' : class.Class.LeftToLearn[i]}} more spells</br></span>
+						<md-button ng-show="class.Class.MustPrepare && class.Class.LeftToPrepare[i] > 0" ng-click="showPepareDialog()">Prepare</md-button>
+						<md-button ng-show="!class.Class.MustPrepare && class.Class.LeftToLearn[i] > 0" ng-click="showLeanDialog()">Learn</md-button>
+					</div>
+					<md-table-container>
+					<table>
+						<thead>
+							<tr>
+								<th ng-show="class.Class.DomainSpells" style='text-align: center'>
+									<span>Is Domain?</span>
+								</th>
+								<th ng-show="class.Class.MustPrepare" style='text-align: center'>
+									<span>Uses Left</span>
+								</th>
+								<!-- <th style='text-align: center'>
+									<span>Name</span>
+								</th>
+								<th style='text-align: center'>
+									<span>Descriptors</span>
+								</th>
+								<th style='text-align: center'>
+									<span>Range</span>
+								</th>
+								<th style='text-align: center'>
+									<span>Casting Time</span>
+								</th>
+								<th style='text-align: center'>
+									<span>Save</span>
+								</th>
+								<th style='text-align: center'>
+									<span>Components</span>
+								</th> -->
+								<th style='text-align: center'>
+									<span></span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="spell in characterSpells[class.Class.Type][i]" ng-click="showSpellDialog(spell)">
+								<td ng-hide="class.Class.DomainSpells == undefined" style='text-align: center'>
+									<span>{{spell.IsDomain ? "Yes" : ""}}</span>
+								</td>
+								<td ng-show="class.Class.MustPrepare" style='text-align: center'>
+									<span>{{spell.UsesLeft}}</span>
+								</td>
+								<!-- <td>
+									<span>{{spell.Name}}</span>
+								</td>
+								<td>
+									<span>{{getSpellDescriptors(spell)}}</span>
+								</td>
+								<td>
+									<span>{{spell.Range}}</span>
+								</td>
+								<td>
+									<span>{{spell.CastingTime}}</span>
+								</td>
+								<td>
+									<span ng-repeat="st in spell.SavingThrows">DC {{st.DC}} {{st.Type}} {{st.Effect}} </span>
+								</td>
+								<td>
+									<span>{{getComponents(spell, class.Class.UseDivineComponent)}}</span>
+								</td> -->
+								<td>
+									<div ng-bind-html="spell.Description"></div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</md-table-container>
+				</div>
+			</md-content>
+		</md-tab>
+	</md-tabs>
+</div>

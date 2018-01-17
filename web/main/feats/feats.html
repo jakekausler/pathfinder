@@ -1,0 +1,18 @@
+<span class="md-display-1">Feats</span><span ng-hide="character.FeatsLeft == 0">(Can add {{character.FeatsLeft}} feats)</span>
+<md-button ng-click="showAddFeatDialog()">Add Feat</md-button>
+<md-content layout-padding>
+	<md-table-container>
+		<table style="width: 100%">
+			<tbody>
+				<tr ng-repeat="f in character.LearnedFeats" ng-click="showFeatDialog($event, $index)">
+					<td>
+						<span>{{f.Name}}</span>
+					</td>
+					<td>
+						<div ng-bind-html="f.Fulltext"></div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</md-table-container>
+</md-content>

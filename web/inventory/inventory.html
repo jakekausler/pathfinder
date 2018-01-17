@@ -1,0 +1,20 @@
+<div layout="column" flex layout-padding>
+	<div layout="row" flex=10>
+		<div flex ng-click="showGoldDialog()">
+			<span flex style="text-align: center; display: block">Gold: {{character.Inventory.Gold}}</span>
+		</div>
+		<div flex ng-click="showExperienceDialog()">
+			<span flex style="text-align: center; display: block">Experience: {{character.Experience}} / {{character.NextLevelExperience}}</span><br>
+			<span flex style="text-align: center; display: block">{{character.Growth}} Growth</span>
+		</div>
+		<div flex>
+			<span flex style="text-align: center; display: block">{{character.Encumberance}} Encumberance</span>
+		</div>
+	</div>
+	<div layout="row" flex>
+		<div layout="column" flex=25 ng-include="'inventory/equipment/equipment.html'">
+		</div>
+		<div layout="column" flex ng-include="'inventory/items/items.html'">
+		</div>
+	</div>
+</div>

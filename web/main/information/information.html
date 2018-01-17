@@ -1,0 +1,84 @@
+<div layout="row" flex>
+	<md-input-container flex="10">
+		<label>Level</label>
+		<input ng-model="character.Level" disabled>
+	</md-input-container>
+	<md-input-container flex>
+		<label>Name</label>
+		<input ng-model="character.Name" ng-change="updateName()">
+	</md-input-container>
+	<md-input-container flex="25">
+		<label>Player Name</label>
+		<input ng-model="character.PlayerName" ng-change="updatePlayer()">
+	</md-input-container>
+	<md-input-container flex="15">
+		<label>Alignment</label>
+		<md-select ng-model="character.Alignment" ng-change="updateAlignment()">
+			<md-option ng-repeat="alignment in alignments" value="{{alignment}}">
+				{{alignment}}
+			</md-option>
+		</md-select>
+	</md-input-container>
+	<md-input-container flex="10">
+		<label>Race</label>
+		<md-select ng-model="character.Race" ng-change="updateRace()">
+			<md-option ng-repeat="race in races" value="{{race}}">
+				{{race}}
+			</md-option>
+		</md-select>
+	</md-input-container>
+	<md-input-container flex="15">
+		<label>Diety</label>
+		<input ng-model="character.Diety" ng-change="updateDiety()">
+	</md-input-container>
+</div>
+<div layout="row" flex>
+	<md-input-container flex="10">
+		<label>Size</label>
+		<md-select ng-model="character.Size" ng-change="updateSize()">
+			<md-option ng-repeat="size in sizes" value="{{size}}">
+				{{size}}
+			</md-option>
+		</md-select>
+	</md-input-container>
+	<md-input-container flex="10">
+		<label>Gender</label>
+		<md-select ng-model="character.Gender" ng-change="updateGender()">
+			<md-option ng-repeat="gender in genders" value="{{gender}}">
+				{{gender}}
+			</md-option>
+		</md-select>
+	</md-input-container>
+	<md-input-container flex="10">
+		<label>Age</label>
+		<input ng-model="character.Age" ng-change="updateAge()">
+	</md-input-container>
+	<md-input-container flex="10">
+		<label>Height</label>
+		<input ng-model="character.Height" ng-change="updateHeight()">
+	</md-input-container>
+	<md-input-container flex="10">
+		<label>Weight</label>
+		<input ng-model="character.Weight" ng-change="updateWeight()">
+	</md-input-container>
+	<md-input-container flex=15>
+		<label>Hair</label>
+		<md-select ng-model="character.HairColor.Name" ng-change="updateHair()">
+			<md-option ng-repeat="color in colors" value="{{color}}">
+				{{color}}
+			</md-option>
+		</md-select>
+	</md-input-container>
+	<md-input-container flex=15>
+		<label>Eye</label>
+		<md-select ng-model="character.EyeColor.Name" ng-change="updateEye()">
+			<md-option ng-repeat="color in colors" value="{{color}}">
+				{{color}}
+			</md-option>
+		</md-select>
+	</md-input-container>
+	<md-input-container flex>
+		<label>Homeland</label>
+		<input ng-model="character.Homeland" ng-change="updateHomeland()">
+	</md-input-container>
+</div>

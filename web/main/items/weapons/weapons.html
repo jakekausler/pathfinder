@@ -1,0 +1,66 @@
+<table style="width: 100%">
+	<thead>
+		<tr>
+			<th style='text-align: center'>
+				<span>Active</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Weapons</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Attacks</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Damage</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Critical</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Range</span>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="w in character.Weapons" ng-click="showWeaponDialog(w)">
+			<td style='text-align: center'>
+				<span>{{w.Active}}</span>
+			</td>
+			<td>
+				<span>{{w.Weapon.Name}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{w.Weapon.Attacks}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{w.Weapon.Damage}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{w.Weapon.Critical}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{w.Weapon.Range}}</span>
+			</td>
+		</tr>
+		<tr ng-click="showClassDialog(-1)">
+			<td>
+				<span>&nbsp;</span>
+			</td>
+			<td>
+				<span>&nbsp;</span>
+			</td>
+			<td style='text-align: center'>
+				<span>&nbsp;</span>
+			</td>
+			<td style='text-align: center'>
+				<span>&nbsp;</span>
+			</td>
+			<td style='text-align: center'>
+				<span>&nbsp;</span>
+			</td>
+			<td style='text-align: center'>
+				<span>&nbsp;</span>
+			</td>
+		</tr>
+	</tbody>
+</table>

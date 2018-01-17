@@ -1,0 +1,33 @@
+<span class="md-display-1">Abilities</span><span ng-hide="character.AbilityPointsLeft == 0">(Can add {{character.AbilityPointsLeft}} points)</span>
+<md-content layout-padding>
+	<md-table-container>
+		<table style="width: 100%">
+			 <thead>
+				<tr>
+					<th>
+						<span></span>
+					</th>
+					<th style='text-align: center'>
+						<span>Score</span>
+					</th>
+					<th style='text-align: center'>
+						<span>Modifier</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="(key, score) in character.Abilities" ng-click="showAbilityDialog($event, key)">
+					<td>
+						<span>{{key}}</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{score}}</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{character.AbilityModifiers[key]}}</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</md-table-container>
+</md-content>

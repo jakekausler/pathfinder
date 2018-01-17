@@ -1,0 +1,4 @@
+<span class="md-display-1">Languages</span><span ng-hide="character.LanguagesLeft == 0">(Can add {{character.LanguagesLeft}} languages)</span>
+<md-content layout-padding ng-click="showLanguageDialog()">
+	<p>{{character.Languages.join(", ")}}</p>
+</md-content>

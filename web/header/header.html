@@ -1,0 +1,17 @@
+<md-toolbar layout="row">
+	<md-button aria-label="Choose Character" ng-click="chooseCharacter()">
+		Choose Character
+	</md-button>
+	<md-button aria-label="Choose Character" ng-disabled="display == 'main'" ng-click="main()">
+		Main Stats
+	</md-button>
+	<md-button aria-label="Inventory" ng-disabled="display == 'inventory'" ng-click="inventory()">
+		Inventory
+	</md-button>
+	<md-button aria-label="Spells" ng-disabled="display == 'spells'" ng-click="spells()">
+		Spells
+	</md-button>
+	<md-button aria-label="Simulator" ng-disabled="display == 'simulator'" ng-click="simulator()">
+		Simulator
+	</md-button>
+</md-toolbar>

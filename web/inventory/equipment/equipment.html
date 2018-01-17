@@ -1,0 +1,17 @@
+<span class="md-display-1">Worn Items</span>
+<md-content layout-padding>
+	<md-table-container>
+		<table style="width: 100%">
+			<tbody>
+				<tr ng-repeat="(key, value) in character.Inventory.Worn" ng-click="showEquipmentDialog(key, value)">
+					<td>
+						<span>{{key}}</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{value}}</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</md-table-container>
+</md-content>

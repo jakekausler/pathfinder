@@ -1,0 +1,22 @@
+<md-dialog aria-label="Experience Dialog">
+	<md-dialog-content>
+		<span class="md-display-1">
+			Experience
+		</span>
+		<md-input-container>
+			<label>Amount</label>
+			<input type="number" ng-model="amount">
+		</md-input-container>
+	</md-dialog-content>
+	<md-dialog-buttons>
+		<md-button ng-click="save('increase')">
+			Gain
+		</md-button>
+		<md-button ng-click="save('reduce')">
+			Lose
+		</md-button>
+		<md-button ng-click="cancel()">
+			Cancel
+		</md-button>
+	</md-dialog-buttons>
+</md-dialog>

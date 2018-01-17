@@ -1,0 +1,28 @@
+<md-dialog aria-label="Damage Dialog">
+	<md-dialog-content>
+		<span class="md-display-1">
+			Health Change
+		</span>
+		<md-input-container>
+			<label>Amount</label>
+			<input type="number" ng-model="amount">
+		</md-input-container>
+	</md-dialog-content>
+	<md-dialog-buttons>
+		<md-button ng-click="save('damage')">
+			Damage
+		</md-button>
+		<md-button ng-click="save('damagenonlethal')">
+			Damage (Non-Lethal)
+		</md-button>
+		<md-button ng-click="save('heal')">
+			Heal
+		</md-button>
+		<md-button ng-click="save('healnonlethal')">
+			Heal (Non-Lethal)
+		</md-button>
+		<md-button ng-click="cancel()">
+			Cancel
+		</md-button>
+	</md-dialog-buttons>
+</md-dialog>

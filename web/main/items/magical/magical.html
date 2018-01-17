@@ -1,0 +1,63 @@
+<table style="width: 100%">
+	 <thead>
+		<tr>
+			<th style='text-align: center'>
+				<span>Active</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Name</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Attacks</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Damage</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Critical</span>
+			</th>
+			<th style='text-align: center'>
+				<span>Range</span>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="w in character.MagicalProtection" ng-click="showMagicalProtectiveDialog(w)">
+			<td style='text-align: center'>
+				<span>{{w.Active}}</span>
+			</td>
+			<td>
+				<span>{{w.MagicalProtection.Name}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{w.MagicalProtection.Purpose}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{w.MagicalProtection.Type}}</span>
+			</td>
+			<td style='text-align: center'>
+				<span>{{w.MagicalProtection.Bonus}}</span>
+			</td>
+		</tr>
+		<tr ng-click="showMagicalProtectiveDialog(-1)">
+			<td>
+				<span>&nbsp;</span>
+			</td>
+			<td>
+				<span>&nbsp;</span>
+			</td>
+			<td style='text-align: center'>
+				<span>&nbsp;</span>
+			</td>
+			<td style='text-align: center'>
+				<span>&nbsp;</span>
+			</td>
+			<td style='text-align: center'>
+				<span>&nbsp;</span>
+			</td>
+			<td style='text-align: center'>
+				<span>&nbsp;</span>
+			</td>
+		</tr>
+	</tbody>
+</table>

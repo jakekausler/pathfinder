@@ -1,0 +1,43 @@
+<span class="md-display-1">Health</span>
+<md-content layout-padding>
+	<md-table-container>
+		<table style="width: 100%">
+			<tbody>
+				<tr ng-click="showDamageDialog()">
+					<td>
+						<span>Health</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{character.HP[0]}} / {{character.HP[1]}}</span>
+					</td>
+				</tr>
+				<tr ng-click="showDamageDialog()">
+					<td>
+						<span>Non-Lethal Damage</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{character.NonLethalDamage}}</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span><b>Resistances</b></span>
+					</td>
+					<td style='text-align: center'>
+						<span></span>
+					</td>
+				</tr>
+				<tr ng-repeat="(key, value) in character.Resistances">
+					<td>
+						<span>{{key}}</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{value}}</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</md-table-container>
+	<span ng-show="character.Effects.length > 0"><b>Active Effects</b></span>
+	<p ng-repeat="effect in character.Effects.length > 0">{{effect}}</p>
+</md-content>

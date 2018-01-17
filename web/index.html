@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pathfinder</title>
+    <base href="/">
+    <script src="lib/bower_components/jquery/dist/jquery.js"></script>
+    <script src="lib/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="lib/bower_components/angular/angular.js"></script>
+    <script src="lib/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="lib/bower_components/angular-aria/angular-aria.js"></script>
+    <script src="lib/bower_components/angular-material/angular-material.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-sanitize.js"></script>
+    <script src="pathfindercontroller.js"></script>
+    <script src="main/maincontroller.js"></script>
+    <script src="inventory/inventorycontroller.js"></script>
+    <script src="spell/spellcontroller.js"></script>
+    <script src="simulator/simulatorcontroller.js"></script>
+    <link rel="stylesheet" type="text/css" href="lib/bower_components/material-design-icons/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="lib/bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="lib/bower_components/angular-material/angular-material.css">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="http://www.d20pfsrd.com/wp-content/themes/srdtheme/css/style.css?ver=1.2.4.8">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <!-- <link rel="stylesheet" type="text/css" href="lib/pathfinder-spell-db/assets/css/pf.css"> -->
+</head>
+
+<body>
+    <div layout="column" flex layout-fill ng-app="pathfinder" ng-controller="pathfinderController as $ctrl">
+        <div id="header" layout="column" ng-include="'header/header.html'"></div>
+        <md-content layout="column" flex>
+        	<div class="main" ui-view layout="column" flex>
+                <div layout="column" flex ng-controller="mainController" id="main-sheet-view" ng-hide="display!='main'" ng-include="'main/main-tall.html'" ng-hide="!isPortrait()" ng-show="isPortrait()"></div>
+		        <div layout="column" flex ng-controller="mainController" id="main-sheet-view" ng-hide="display!='main'" ng-include="'main/main-wide.html'" ng-hide="isPortrait()" ng-show="!isPortrait()"></div>
+		        <div layout="column" ng-controller="inventoryController" id="inventory-sheet-view" ng-hide="display!='inventory'" flex ng-include="'inventory/inventory.html'"></div>
+		        <div layout="column" ng-controller="spellController" id="spell-sheet-view" ng-hide="display!='spells'" flex ng-include="'spell/spell.html'"></div>
+		        <div layout="column" ng-controller="simulatorController" id="simulator-sheet-view" ng-hide="display!='simulator'" flex ng-include="'simulator/simulator.html'"></div>
+		    </div>
+	    </md-content>
+        <footer>
+		</footer>
+    </div>
+</body>
+
+</html>

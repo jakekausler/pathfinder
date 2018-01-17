@@ -1,0 +1,28 @@
+<md-dialog aria-label="Ability Dialog">
+	<md-dialog-content>
+		<span class="md-display-1">
+			{{key}}
+		</span>
+		<md-input-container>
+			<label>Amount</label>
+			<input type="number" ng-model="amount">
+		</md-input-container>
+	</md-dialog-content>
+	<md-dialog-buttons>
+		<md-button ng-click="save('increase')">
+			Increase
+		</md-button>
+		<md-button ng-click="save('decrease')">
+			Decrease
+		</md-button>
+		<md-button ng-click="save('tempincrease')">
+			Increase (Temporary)
+		</md-button>
+		<md-button ng-click="save('tempdecrease')">
+			Decrease (Temporary)
+		</md-button>
+		<md-button ng-click="cancel()">
+			Cancel
+		</md-button>
+	</md-dialog-buttons>
+</md-dialog>

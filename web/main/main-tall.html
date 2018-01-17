@@ -1,0 +1,34 @@
+<div layout="column" flex layout-padding>
+	<div layout="row" flex="10">
+		<div layout="column" flex ng-include="'main/information/information.html'"></div>
+		<div layout="column" flex="25" ng-include="'main/classes/classes.html'"></div>
+	</div>
+	<div layout="row" flex="66">
+		<div layout="column" flex>
+			<div layout="row" flex>
+				<div layout="column" flex ng-include="'main/abilities/abilities.html'"></div>
+				<div layout="column" flex=66 ng-include="'main/combatstats/combatstats.html'"></div>
+			</div>
+			<div layout="row" flex>
+				<div layout="column" flex ng-include="'main/health/health.html'"></div>
+				<div layout="column" flex="66">
+					<span class="md-display-1">Weapons and Armor</span>
+					<md-content layout-padding flex layout="column">
+						<span class="md-subhead">Weapons</span>
+						<md-table-container ng-include="'main/items/weapons/weapons.html'"></md-table-container>
+						<span class="md-subhead">Armor/Shield</span>
+						<md-table-container ng-include="'main/items/armor/armor.html'"></md-table-container>
+						<span class="md-subhead">Magical Protectives</span>
+						<md-table-container ng-include="'main/items/magical/magical.html'"></md-table-container>
+					</md-content>
+				</div>
+			</div>
+			<div layout="row" flex="25">
+				<div layout="column" flex ng-include="'main/speeds/speeds.html'"></div>
+				<div layout="column" flex="66" ng-include="'main/languages/languages.html'"></div>
+			</div>
+		</div>
+		<div layout="column" flex="25" ng-include="'main/skills/skills.html'"></div>
+	</div>
+	<div layout="column" flex ng-include="'main/feats/feats.html'"></div>
+</div>

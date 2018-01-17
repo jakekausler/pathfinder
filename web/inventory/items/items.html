@@ -1,0 +1,51 @@
+<span class="md-display-1">Inventory</span>
+<md-content layout-padding>
+	<md-table-container>
+		<table style="width: 100%">
+			 <thead>
+				<tr>
+					<th style='text-align: center'>
+						<span>Quantity</span>
+					</th>
+					<th>
+						<span>Item</span>
+					</th>
+					<th style='text-align: center'>
+						<span>Value</span>
+					</th>
+					<th style='text-align: center'>
+						<span>Weight</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="i in character.Inventory.Items" ng-click="showItemsDialog(i)">
+					<td style='text-align: center'>
+						<span>{{i.Quantity}}</span>
+					</td>
+					<td>
+						<span>{{i.Item.Name}}</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{i.Item.Value}} gp</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{i.Item.Weight}} lbs</span>
+					</td>
+				</tr>
+				<tr>
+					<td style='text-align: center'>
+					</td>
+					<td>
+					</td>
+					<td style='text-align: center'>
+						<span><b>{{character.Inventory.TotalValue}} gp</b></span>
+					</td>
+					<td style='text-align: center'>
+						<span><b>{{character.Inventory.TotalWeight}} lbs</b></span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</md-table-container>
+</md-content>

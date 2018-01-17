@@ -1,0 +1,27 @@
+<span class="md-display-1">Classes</span><span ng-hide="character.ClassLevelsLeft==0">(Can add {{character.ClassLevelsLeft}} levels)</span>
+<md-content layout-padding>
+	<md-table-container>
+		<table style="width: 100%">
+			 <thead>
+				<tr>
+					<th>
+						<span>Class</span>
+					</th>
+					<th style='text-align: center'>
+						<span>Level</span>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="c in character.Classes" ng-click="showClassDialog(c)">
+					<td>
+						<span>{{c.Class.Type}}</span>
+					</td>
+					<td style='text-align: center'>
+						<span>{{c.Level}}</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</md-table-container>
+</md-content>
