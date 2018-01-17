@@ -1,6 +1,6 @@
 <div layout="column" flex layout-padding>
 	<md-tabs flex>
-		<md-tab ng-repeat="class in character.Classes" label="{{class.Class.Type}}" flex>
+		<md-tab ng-repeat="class in character.Classes" label="{{class.Class.Type}}" ng-init="classIndex=$index" flex>
 			<md-content layout-padding flex>
 				<div ng-hide="characterSpells[class.Class.Type][i].length == 0" ng-repeat="i in getNumberArray(10)">
 					<div>
@@ -8,8 +8,8 @@
 						<span>Can cast {{class.Class.SpellsPerDay[i] == -999999999 ? '∞' : class.Class.SpellsPerDay[i]}} more spells</br></span>
 						<span ng-show="class.Class.MustPrepare && class.Class.LeftToPrepare[i] > 0">Can prepare {{class.Class.LeftToPrepare[i] == -999999999 ? '∞' : class.Class.LeftToPrepare[i]}} more spells</br></span><span ng-show="class.Class.UseDomain && class.Class.LeftToPrepareDomain[i] > 0">Can prepare {{class.Class.LeftToPrepareDomain[i] == -999999999 ? '∞' : class.Class.LeftToPrepareDomain[i]}} more domain spells</br></span>
 						<span ng-show="!class.Class.MustPrepare && class.Class.LeftToLearn[i] > 0">Can learn {{class.Class.LeftToLearn[i] == -999999999 ? '∞' : class.Class.LeftToLearn[i]}} more spells</br></span>
-						<md-button ng-show="class.Class.MustPrepare && class.Class.LeftToPrepare[i] > 0" ng-click="showPepareDialog()">Prepare</md-button>
-						<md-button ng-show="!class.Class.MustPrepare && class.Class.LeftToLearn[i] > 0" ng-click="showLeanDialog()">Learn</md-button>
+						<md-button ng-show="class.Class.MustPrepare && class.Class.LeftToPrepare[i] > 0" ng-click="showPrepareDialog($event, i)">Prepare</md-button>
+						<md-button ng-show="!class.Class.MustPrepare && class.Class.LeftToLearn[i] > 0" ng-click="showLearnDialog($event, i)">Learn</md-button>
 					</div>
 					<md-table-container>
 					<table>
@@ -45,7 +45,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="spell in characterSpells[class.Class.Type][i]" ng-click="showSpellDialog(spell)">
+							<tr ng-repeat="spell in characterSpells[class.Class.Type][i]" ng-click="showSpellDialog($event, classIndex, i, $index, spell.IsDomain)">
 								<td ng-hide="class.Class.DomainSpells == undefined" style='text-align: center'>
 									<span>{{spell.IsDomain ? "Yes" : ""}}</span>
 								</td>

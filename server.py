@@ -713,18 +713,92 @@ class Handler(SimpleHTTPRequestHandler):
                     else:
                         self.Failure("Could not parse request")
                 elif query.startswith("/character/spell"):
-                    # TODO
                     if query == "/character/spell/use":
-                        return
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'value' not in params or len(params['value']) < 1:
+                            self.Failure("No value provided")
+                        elif 'classindex' not in params or len(params['classindex']) < 1:
+                            self.Failure("No classindex provided")
+                        elif 'level' not in params or len(params['level']) < 1:
+                            self.Failure("No level provided")
+                        elif 'spellidx' not in params or len(params['spellidx']) < 1:
+                            self.Failure("No spellidx provided")
+                        else:
+                            try:
+                                domain = False
+                                if 'domain' in params or len(params['domain']) > 0:
+                                    domain = params['domain'][0] == 'true'
+                                char.UseSpell(int(params['classindex'][0]), int(params['level'][0]), int(params['spellidx'][0]), int(params['value'][0]), domain)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
                     elif query == "/character/spell/learn":
+                        # TODO
                         return
                     elif query == "/character/spell/forget":
+                        # TODO
                         return
                     elif query == "/character/spell/prepare":
+                        # TODO
                         return
+                    elif query == "/character/spell/prepareexisting":
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'value' not in params or len(params['value']) < 1:
+                            self.Failure("No value provided")
+                        elif 'classindex' not in params or len(params['classindex']) < 1:
+                            self.Failure("No classindex provided")
+                        elif 'level' not in params or len(params['level']) < 1:
+                            self.Failure("No level provided")
+                        elif 'spellidx' not in params or len(params['spellidx']) < 1:
+                            self.Failure("No spellidx provided")
+                        else:
+                            try:
+                                domain = False
+                                if 'domain' in params or len(params['domain']) > 0:
+                                    domain = params['domain'][0] == 'true'
+                                char.PrepareExistingSpell(int(params['classindex'][0]), int(params['level'][0]), int(params['spellidx'][0]), int(params['value'][0]), domain)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
                     elif query == "/character/spell/unprepare":
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'value' not in params or len(params['value']) < 1:
+                            self.Failure("No value provided")
+                        elif 'classindex' not in params or len(params['classindex']) < 1:
+                            self.Failure("No classindex provided")
+                        elif 'level' not in params or len(params['level']) < 1:
+                            self.Failure("No level provided")
+                        elif 'spellidx' not in params or len(params['spellidx']) < 1:
+                            self.Failure("No spellidx provided")
+                        else:
+                            try:
+                                domain = False
+                                if 'domain' in params or len(params['domain']) > 0:
+                                    domain = params['domain'][0] == 'true'
+                                char.UnPrepareSpell(int(params['classindex'][0]), int(params['level'][0]), int(params['spellidx'][0]), int(params['value'][0]), domain)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
+                    elif query == "/character/spell/resetall":
+                        # TODO
                         return
-                    elif query == "/character/spell/edituses":
+                    elif query == "/character/spell/resetclass":
+                        # TODO
+                        return
+                    elif query == "/character/spell/resetlevel":
+                        # TODO
                         return
                     else:
                         self.Failure("Could not parse request")

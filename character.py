@@ -1,8 +1,4 @@
 
-# TODO: Add feats, feats to learn, abilities to learn, languages to learn, skills to learn
-# TODO: Add Experience, Encuberance to JSON
-# TODO: Add skill modifiers, class skills, trained skills
-
 import alignment
 import race
 import gender
@@ -644,19 +640,26 @@ class Character:
             else:
                 self.Classes[classIdx][0].PrepareSpell(sp, uses)
 
-    def UseSpell(self, classIdx, spLevel, spIdx, domain=False):
+    def PrepareExistingSpell(self, classIdx, level, spellIdx, uses, domain=False):
         if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
             if isinstance(self.Classes[classIdx][0], characterclass.Cleric):
-                self.Classes[classIdx][0].UseSpell(spLevel, spIdx, domain)
+                self.Classes[classIdx][0].PrepareExistingSpell(level, spellIdx, uses, domain)
             else:
-                self.Classes[classIdx][0].UseSpell(spLevel, spIdx)
+                self.Classes[classIdx][0].PrepareExistingSpell(level, spellIdx, uses)
 
-    def UnPrepareSpell(self, classIdx, spLevel, spIdx, domain=False):
+    def UseSpell(self, classIdx, spLevel, spIdx, uses, domain=False):
         if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
             if isinstance(self.Classes[classIdx][0], characterclass.Cleric):
-                self.Classes[classIdx][0].UseSpell(spLevel, spIdx, domain)
+                self.Classes[classIdx][0].UseSpell(spLevel, spIdx, uses, domain)
             else:
-                self.Classes[classIdx][0].UnPrepareSpell(spLevel, spIdx)
+                self.Classes[classIdx][0].UseSpell(spLevel, spIdx, uses)
+
+    def UnPrepareSpell(self, classIdx, spLevel, spIdx, uses, domain=False):
+        if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
+            if isinstance(self.Classes[classIdx][0], characterclass.Cleric):
+                self.Classes[classIdx][0].UnPrepareSpell(spLevel, spIdx, uses, domain)
+            else:
+                self.Classes[classIdx][0].UnPrepareSpell(spLevel, spIdx, uses)
 
     def UnPrepareSpells(self, classIdx, level=-1):
         if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):

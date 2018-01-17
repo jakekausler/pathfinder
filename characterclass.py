@@ -267,7 +267,7 @@ class SpellcastingClass(CharacterClass):
         super(SpellcastingClass, self).__init__(character, characterClassIdx)
         self.KnownSpells = [[] for i in range(10)]  # Per level, list of spells known. Empty if knows all
         self.PreparedSpells = [[] for i in range(10)]  # Per level, list of [spell, uses]
-        self.UsedSpells = [[] for i in range(10)]
+        self.UsedSpells = [0 for i in range(10)]
 
     def GetNumSpellsKnown(self, level):
         return self.SpellsKnown[self.ClassLevel()-1][level]
@@ -305,16 +305,20 @@ class SpellcastingClass(CharacterClass):
         if self.CanPrepareSpell(sp, uses):
             self.PreparedSpells[sp.GetSpellLevel(self)].append([sp, uses])
 
-    def UseSpell(self, spLevel, spIdx):
-        if self.CanUseSpell(spLevel, spIdx):
-            self.PreparedSpells[spLevel][spIdx][1] -= 1
-            self.UsedSpells[spLevel] += 1
+    def PrepareExistingSpell(self, level, spellIdx, uses):
+        if uses <= self.GetNumSpellsToPrepare(level):
+            self.PreparedSpells[level][spellIdx][1] += uses
+
+    def UseSpell(self, spLevel, spIdx, uses):
+        if self.CanUseSpell(spLevel, spIdx, uses):
+            self.PreparedSpells[spLevel][spIdx][1] -= uses
+            self.UsedSpells[spLevel] += uses
 
     def CanPrepareSpell(self, sp, uses):
         return sp.GetSpellLevel(self) >= 0 and self.GetNumSpellsToPrepare(sp.GetSpellLevel(self)) >= uses and not self.IsPrepared(sp)
 
-    def UnPrepareSpell(self, spLevel, spIdx):
-        del self.PreparedSpells[spLevel][spIdx]
+    def UnPrepareSpell(self, spLevel, spIdx, uses):
+        self.PreparedSpells[spLevel][spIdx][1] = max(0, self.PreparedSpells[spLevel][spIdx][1] - uses)
 
     def UnPrepareSpells(self, level):
         self.PreparedSpells[level] = []
@@ -330,16 +334,16 @@ class SpellcastingClass(CharacterClass):
     def GetDailyUsagesLeft(self, level):
         if self.NumSpellsPerDay(level) < 0:
             return self.NumSpellsPerDay(level)
-        return self.NumSpellsPerDay(level) - len(self.UsedSpells[0])
+        return self.NumSpellsPerDay(level) - self.UsedSpells[level]
 
     def CanLearnSpell(self, sp):
         return sp.GetSpellLevel(self) >= 0 and self.GetNumSpellsToLearn(sp.GetSpellLevel(self)) > 0 and not self.IsKnown(sp)
 
-    def CanUseSpell(self, sp):
+    def CanUseSpell(self, sp, uses):
         lev = sp.GetSpellLevel(self)
         if lev < 0:
             return False
-        return (self.GetDailyUsagesLeft(lev) > 0 or self.GetDailyUsagesLeft(lev) == config.INFINITY) and (not self.MustPrepare or self.IsPrepared(sp))
+        return (self.GetDailyUsagesLeft(lev) >= uses or self.GetDailyUsagesLeft(lev) == config.INFINITY) and (not self.MustPrepare or self.IsPrepared(sp))
 
     def IsPrepared(self, sp):
         return any(sp == i[0] for i in self.PreparedSpells[sp.GetSpellLevel(self)])
@@ -377,7 +381,6 @@ class SpellcastingClass(CharacterClass):
             if self.CanLearnSpell(s):
                 ret.append(s)
         return ret
-
 
     def GetValidSpellsJson(self, level):
         return [s.ToJson(self.ClassLevel(), self.Character.AbilityModifiers()[self.Spellcasting], s.GetSpellLevel(self)) for s in self.GetValidSpells(level)]
@@ -486,39 +489,48 @@ class Cleric(SpellcastingClass):
             else:
                 self.PreparedSpells[sp.GetSpellLevel(self)].append([sp, uses])
 
+    def PrepareExistingSpell(self, level, spellIdx, uses, domain=False):
+        if domain:
+            if uses <= self.GetNumSpellsToPrepareDomain(level):
+                print level, spellIdx, uses
+                self.DomainSpells[level][spellIdx][1] += uses
+        else:
+            super(Cleric, self).PrepareExistingSpell(level, spellIdx, uses)
+
     def CanPrepareSpell(self, sp, uses, domain=False):
         if domain:
             return sp.GetSpellLevel(self, domains=self.Domains) >= 0 and self.GetNumSpellsToPrepare(sp.GetSpellLevel(self, self.Domains)) >= uses and not self.IsPrepared(sp)
         else:
             return super(Cleric, self).CanPrepareSpell(sp, uses)
 
-    def UseSpell(self, spLevel, spIdx, domain=False):
-        if self.CanUseSpell(spLevel, spIdx, domain):
+    def UseSpell(self, spLevel, spIdx, uses, domain=False):
+        if self.CanUseSpell(spLevel, spIdx, uses, domain):
             if domain:
-                self.DomainSpells[spLevel][spIdx][1] -= 1
+                self.DomainSpells[spLevel][spIdx][1] -= uses
             else:
-                self.PreparedSpells[spLevel][spIdx][1] -= 1
-            self.UsedSpells[spLevel] += 1
+                self.PreparedSpells[spLevel][spIdx][1] -= uses
+            print self.UsedSpells
+            self.UsedSpells[spLevel] += uses
 
-    def CanUseSpell(self, spLevel, spIdx, domain=False):
+    def CanUseSpell(self, spLevel, spIdx, uses, domain=False):
         if domain:
             if not self.DomainSpells[spLevel] or not self.DomainSpells[spLevel][spIdx]:
                 return False
             lev = self.DomainSpells[spLevel][spIdx].GetSpellLevel(self, domains=self.Domains)
             if lev < 0:
                 return False
-            return (self.GetDailyUsagesLeft(lev) > 0 or self.GetDailyUsagesLeft(lev) == config.INFINITY) and (not self.MustPrepare or self.IsPrepared(sp))
+            return (self.GetDailyUsagesLeft(lev) >= uses or self.GetDailyUsagesLeft(lev) == config.INFINITY) and (not self.MustPrepare or self.IsPrepared(sp))
         else:
-            return super(Cleric, self).CanUseSpell(spLevel, spIdx)
+            return super(Cleric, self).CanUseSpell(self.PreparedSpells[spLevel][spIdx][0], uses)
 
     def IsPrepared(self, sp, domain=False):
         return any(sp == i[0] for i in self.PreparedSpells[sp.GetSpellLevel(self)]) or any(sp == i[0] for i in self.DomainSpells[sp.GetSpellLevel(self)])
 
-    def UnPrepareSpell(self, spLevel, spIdx, domain=False):
+    def UnPrepareSpell(self, spLevel, spIdx, uses, domain=False):
         if domain:
-            del self.DomainSpells[spLevel][spIdx]
+            self.DomainSpells[spLevel][spIdx][0] = max(0, self.DomainSpells[spLevel][spIdx][0] - uses)
         else:
-            super(Cleric, self).UnPrepareSpell(spLevel, spIdx, domain)
+            super(Cleric, self).UnPrepareSpell(spLevel, spIdx, uses)
 
     def UnPrepareSpells(self, level):
         self.DomainSpells[level] = []
@@ -596,3 +608,6 @@ class Sorcerer(SpellcastingClass):
 
     def GetNumSpellsKnown(self, level):
         return super(Sorcerer, self).GetNumSpellsKnown(level) - self.ReplacedSpells + config.BLOODLINE_SPELLS[self.ClassLevel()-1]
+
+    def CanUseSpell(self, spLevel, spIdx, uses):
+        return super(Sorcerer, self).CanUseSpell(self.KnownSpells[spLevel][spIdx], uses)

@@ -1,15 +1,16 @@
-<md-dialog aria-label=" Dialog">
+<md-dialog aria-label="Prepare Dialog">
 	<md-dialog-content>
 		<span class="md-display-1">
-
+			Prepare Spell
 		</span>
 		<md-input-container>
-			<label></label>
+			<label>Amount</label>
+			<input type="number" ng-model="amount">
 		</md-input-container>
 	</md-dialog-content>
 	<md-dialog-buttons>
-		<md-button ng-click="save()">
-			Save
+		<md-button ng-click="save('prepare')">
+			Prepare
 		</md-button>
 		<md-button ng-click="cancel()">
 			Cancel

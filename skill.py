@@ -166,7 +166,7 @@ def GetSkillNames():
     ]
 
 
-class Skill:
+class Skill(object):
     Name = "Skill"
     Ability = config.ABILITY_STRENGTH
     IsTrained = False
@@ -174,6 +174,9 @@ class Skill:
 
     def __init__(self, key):
         self.Key = key
+        self.Actions = {}  # Dictionary of action name to check amount
+        self.ActiveModifiers = {}  # Dictionary of Modifier name to bool
+        self.ModifierAmounts = {}  # Dictionary of Modifier name to amount
 
     def GetTotal(self, character):
         ret = 0
@@ -189,15 +192,34 @@ class Skill:
                 ret += character.ArmorCheckPenalty()
             ret += character.AbilityModifiers()[self.Ability]
             ret += (character.CalculateEffects(character.EffectSkillCheckAll) +
-                              character.CalculateEffects(character.EffectSkillCheck[self.Key]) +
-                              character.FeatSkills[self.Key] +
-                              character.MiscSkills[self.Key] +
-                              character.FCSkills[self.Key] +
-                              character.Race.RacialSkills[self.Key])
+                            character.CalculateEffects(character.EffectSkillCheck[self.Key]) +
+                            character.FeatSkills[self.Key] +
+                            character.MiscSkills[self.Key] +
+                            character.FCSkills[self.Key] +
+                            character.Race.RacialSkills[self.Key])
         return ret
 
     def IsAvailable(self, character):
         return not self.IsTrained or character.Skills[self.Key][0] > 0
+
+    def GetChanceOfSuccess(self, character, action):
+        if self.GetSkillCheck(character, action) == config.INFINITY:
+            return 1
+        return 1 - (self.GetSkillCheck(action) - self.GetTotal(character)) / 20.0
+
+    # Return INFINITY if no check is needed
+    def GetSkillCheck(self, character, action):
+        check = self.Actions[action]
+        for key in self.ActiveModifiers:
+            if self.ActiveModifiers[key]:
+                check += self.ModifierAmounts[key]
+        return check
+
+    def ActivateModifer(self, modifer):
+        self.ActiveModifiers[modifer] = True
+
+    def DeactivateModifer(self, modifer):
+        self.ActiveModifiers[modifer] = False
 
 
 class acrobatics(Skill):
@@ -206,7 +228,43 @@ class acrobatics(Skill):
     UseACP = True
 
     def __init__(self, key):
-        self.Key = key
+        super(acrobatics, self).__init__(key)
+        self.ModifierAmounts['Lightly Obstructed'] = 2
+        self.ActiveModifiers['Lightly Obstructed'] = False
+        self.ModifierAmounts['Severely Obstructed'] = 5
+        self.ActiveModifiers['Severely Obstructed'] = False
+        self.ModifierAmounts['Slightly Slippery'] = 2
+        self.ActiveModifiers['Slightly Slippery'] = False
+        self.ModifierAmounts['Severely Slippery'] = 5
+        self.ActiveModifiers['Severely Slippery'] = False
+        self.ModifierAmounts['Slightly Sloped'] = 2
+        self.ActiveModifiers['Slightly Sloped'] = False
+        self.ModifierAmounts['Severely Sloped'] = 5
+        self.ActiveModifiers['Severely Sloped'] = False
+        self.ModifierAmounts['Slightly Unsteady'] = 2
+        self.ActiveModifiers['Slightly Unsteady'] = False
+        self.ModifierAmounts['Mildly Unsteady'] = 5
+        self.ActiveModifiers['Mildly Unsteady'] = False
+        self.ModifierAmounts['Severely Unsteady'] = 10
+        self.ActiveModifiers['Severely Unsteady'] = False
+        self.ModifierAmounts['Balancing Pole'] = 1
+        self.ActiveModifiers['Balancing Pole'] = False
+        self.ModifierAmounts['Move at full speed on narrow or uneven surfaces'] = 5
+        self.ActiveModifiers['Move at full speed on narrow or uneven surfaces'] = False
+        self.Actions['Cross Narrow Surface/Uneven Ground (> 3 ft wide)'] = 0
+        self.Actions['Cross Narrow Surface/Uneven Ground (1-3 ft wide)'] = 5
+        self.Actions['Cross Narrow Surface/Uneven Ground (7-11 in wide)'] = 10
+        self.Actions['Cross Narrow Surface/Uneven Ground (2-6 in wide)'] = 15
+        self.Actions['Cross Narrow Surface/Uneven Ground (< 2 in wide)'] = 20
+
+    def GetSkillCheck(self, character, action):
+        check = super(acrobatics, self).GetSkillCheck(character, action)
+        if check < 10 and action in ['Cross Narrow Surface/Uneven Ground (> 3 ft wide)',
+                    'Cross Narrow Surface/Uneven Ground (1-3 ft wide)',
+                    'Cross Narrow Surface/Uneven Ground (7-11 in wide)',
+                    'Cross Narrow Surface/Uneven Ground (2-6 in wide)',
+                    'Cross Narrow Surface/Uneven Ground (< 2 in wide)']:
+            return config.INFINITY
 
 
 class appraise(Skill):
@@ -214,7 +272,7 @@ class appraise(Skill):
     Ability = config.ABILITY_INTELLIGENCE
 
     def __init__(self, key):
-        self.Key = key
+        super(appraise, self).__init__(key)
 
 
 class bluff(Skill):
@@ -222,7 +280,7 @@ class bluff(Skill):
     Ability = config.ABILITY_CHARISMA
 
     def __init__(self, key):
-        self.Key = key
+        super(bluff, self).__init__(key)
 
 
 class climb(Skill):
@@ -231,7 +289,7 @@ class climb(Skill):
     UseACP = True
 
     def __init__(self, key):
-        self.Key = key
+        super(climb, self).__init__(key)
 
 
 class craft1(Skill):
@@ -239,7 +297,7 @@ class craft1(Skill):
     Ability = config.ABILITY_INTELLIGENCE
 
     def __init__(self, key):
-        self.Key = key
+        super(craft1, self).__init__(key)
 
 
 class craft2(Skill):
@@ -247,7 +305,7 @@ class craft2(Skill):
     Ability = config.ABILITY_INTELLIGENCE
 
     def __init__(self, key):
-        self.Key = key
+        super(craft2, self).__init__(key)
 
 
 class diplomacy(Skill):
@@ -255,7 +313,7 @@ class diplomacy(Skill):
     Ability = config.ABILITY_CHARISMA
 
     def __init__(self, key):
-        self.Key = key
+        super(diplomacy, self).__init__(key)
 
 
 class disable_device(Skill):
@@ -265,7 +323,7 @@ class disable_device(Skill):
     UseACP = True
 
     def __init__(self, key):
-        self.Key = key
+        super(disable_device, self).__init__(key)
 
 
 class disguise(Skill):
@@ -273,7 +331,7 @@ class disguise(Skill):
     Ability = config.ABILITY_CHARISMA
 
     def __init__(self, key):
-        self.Key = key
+        super(disguise, self).__init__(key)
 
 
 class escape_artist(Skill):
@@ -282,7 +340,7 @@ class escape_artist(Skill):
     UseACP = True
 
     def __init__(self, key):
-        self.Key = key
+        super(escape_artist, self).__init__(key)
 
 
 class fly(Skill):
@@ -291,7 +349,7 @@ class fly(Skill):
     UseACP = True
 
     def __init__(self, key):
-        self.Key = key
+        super(fly, self).__init__(key)
 
 
 class handle_animal(Skill):
@@ -300,7 +358,7 @@ class handle_animal(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(handle_animal, self).__init__(key)
 
 
 class heal(Skill):
@@ -308,7 +366,7 @@ class heal(Skill):
     Ability = config.ABILITY_WISDOM
 
     def __init__(self, key):
-        self.Key = key
+        super(heal, self).__init__(key)
 
 
 class intimidate(Skill):
@@ -316,7 +374,7 @@ class intimidate(Skill):
     Ability = config.ABILITY_CHARISMA
 
     def __init__(self, key):
-        self.Key = key
+        super(intimidate, self).__init__(key)
 
 
 class knowledge_arcana(Skill):
@@ -325,7 +383,7 @@ class knowledge_arcana(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_arcana, self).__init__(key)
 
 
 class knowledge_dungeoneering(Skill):
@@ -334,7 +392,7 @@ class knowledge_dungeoneering(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_dungeoneering, self).__init__(key)
 
 
 class knowledge_engineering(Skill):
@@ -343,7 +401,7 @@ class knowledge_engineering(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_engineering, self).__init__(key)
 
 
 class knowledge_geography(Skill):
@@ -352,7 +410,7 @@ class knowledge_geography(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_geography, self).__init__(key)
 
 
 class knowledge_history(Skill):
@@ -361,7 +419,7 @@ class knowledge_history(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_history, self).__init__(key)
 
 
 class knowledge_local(Skill):
@@ -370,7 +428,7 @@ class knowledge_local(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_local, self).__init__(key)
 
 
 class knowledge_nature(Skill):
@@ -379,7 +437,7 @@ class knowledge_nature(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_nature, self).__init__(key)
 
 
 class knowledge_nobility(Skill):
@@ -388,7 +446,7 @@ class knowledge_nobility(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_nobility, self).__init__(key)
 
 
 class knowledge_planes(Skill):
@@ -397,7 +455,7 @@ class knowledge_planes(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_planes, self).__init__(key)
 
 
 class knowledge_religion(Skill):
@@ -406,7 +464,7 @@ class knowledge_religion(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(knowledge_religion, self).__init__(key)
 
 
 class linguistics(Skill):
@@ -415,7 +473,7 @@ class linguistics(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(linguistics, self).__init__(key)
 
 
 class perception(Skill):
@@ -423,7 +481,7 @@ class perception(Skill):
     Ability = config.ABILITY_WISDOM
 
     def __init__(self, key):
-        self.Key = key
+        super(perception, self).__init__(key)
 
 
 class perform1(Skill):
@@ -431,7 +489,7 @@ class perform1(Skill):
     Ability = config.ABILITY_CHARISMA
 
     def __init__(self, key):
-        self.Key = key
+        super(perform1, self).__init__(key)
 
 
 class perform2(Skill):
@@ -439,7 +497,7 @@ class perform2(Skill):
     Ability = config.ABILITY_CHARISMA
 
     def __init__(self, key):
-        self.Key = key
+        super(perform2, self).__init__(key)
 
 
 class prof1(Skill):
@@ -448,7 +506,7 @@ class prof1(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(prof1, self).__init__(key)
 
 
 class prof2(Skill):
@@ -457,7 +515,7 @@ class prof2(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(prof2, self).__init__(key)
 
 
 class ride(Skill):
@@ -466,7 +524,7 @@ class ride(Skill):
     UseACP = True
 
     def __init__(self, key):
-        self.Key = key
+        super(ride, self).__init__(key)
 
 
 class sense_motive(Skill):
@@ -474,7 +532,7 @@ class sense_motive(Skill):
     Ability = config.ABILITY_WISDOM
 
     def __init__(self, key):
-        self.Key = key
+        super(sense_motive, self).__init__(key)
 
 
 class sleight_of_hand(Skill):
@@ -484,7 +542,7 @@ class sleight_of_hand(Skill):
     UseACP = True
 
     def __init__(self, key):
-        self.Key = key
+        super(sleight_of_hand, self).__init__(key)
 
 
 class spellcraft(Skill):
@@ -493,7 +551,7 @@ class spellcraft(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(spellcraft, self).__init__(key)
 
 
 class stealth(Skill):
@@ -502,7 +560,7 @@ class stealth(Skill):
     UseACP = True
 
     def __init__(self, key):
-        self.Key = key
+        super(stealth, self).__init__(key)
 
 
 class survival(Skill):
@@ -510,7 +568,7 @@ class survival(Skill):
     Ability = config.ABILITY_WISDOM
 
     def __init__(self, key):
-        self.Key = key
+        super(survival, self).__init__(key)
 
 
 class swim(Skill):
@@ -519,7 +577,7 @@ class swim(Skill):
     UseACP = True
 
     def __init__(self, key):
-        self.Key = key
+        super(swim, self).__init__(key)
 
 
 class use_magic_device(Skill):
@@ -528,7 +586,7 @@ class use_magic_device(Skill):
     IsTrained = True
 
     def __init__(self, key):
-        self.Key = key
+        super(use_magic_device, self).__init__(key)
 
 
 SkillClasses = {
