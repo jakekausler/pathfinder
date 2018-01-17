@@ -1,46 +1,10 @@
 
 import config
+import urllib2
+from bs4 import BeautifulSoup
+import os
 
 # TODO: Add ability to see what actions can be done with a skill, and the chance that the action will succeed
-
-config.SKILL_ACROBATICS = 1
-config.SKILL_APPRAISE = 2
-config.SKILL_BLUFF = 3
-config.SKILL_CLIMB = 4
-config.SKILL_CRAFT1 = 5
-config.SKILL_CRAFT2 = 6
-config.SKILL_DIPLOMACY = 7
-config.SKILL_DISABLE_DEVICE = 8
-config.SKILL_DISGUISE = 9
-config.SKILL_ESCAPE_ARTIST = 10
-config.SKILL_FLY = 11
-config.SKILL_HANDLE_ANIMAL = 12
-config.SKILL_HEAL = 13
-config.SKILL_INTIMIDATE = 14
-config.SKILL_KNOWLEDGE_ARCANA = 15
-config.SKILL_KNOWLEDGE_DUNGEONEERING = 16
-config.SKILL_KNOWLEDGE_ENGINEERING = 17
-config.SKILL_KNOWLEDGE_GEOGRAPHY = 18
-config.SKILL_KNOWLEDGE_HISTORY = 19
-config.SKILL_KNOWLEDGE_LOCAL = 20
-config.SKILL_KNOWLEDGE_NATURE = 21
-config.SKILL_KNOWLEDGE_NOBILITY = 22
-config.SKILL_KNOWLEDGE_PLANES = 23
-config.SKILL_KNOWLEDGE_RELIGION = 24
-config.SKILL_LINGUISTICS = 25
-config.SKILL_PERCEPTION = 26
-config.SKILL_PERFORM1 = 27
-config.SKILL_PERFORM2 = 28
-config.SKILL_PROF1 = 29
-config.SKILL_PROF2 = 30
-config.SKILL_RIDE = 31
-config.SKILL_SENSE_MOTIVE = 32
-config.SKILL_SLEIGHT_OF_HAND = 33
-config.SKILL_SPELLCRAFT = 34
-config.SKILL_STEALTH = 35
-config.SKILL_SURVIVAL = 36
-config.SKILL_SWIM = 37
-config.SKILL_USE_MAGIC_DEVICE = 38
 
 
 def GetSkillName(n):
@@ -171,10 +135,11 @@ class Skill(object):
     Ability = config.ABILITY_STRENGTH
     IsTrained = False
     UseACP = False
+    WebName = ""
 
     def __init__(self, key):
         self.Key = key
-        self.Actions = {}  # Dictionary of action name to check amount
+        self.Actions = {}  # Dictionary of action name to {subaction: score}
         self.ActiveModifiers = {}  # Dictionary of Modifier name to bool
         self.ModifierAmounts = {}  # Dictionary of Modifier name to amount
 
@@ -202,14 +167,14 @@ class Skill(object):
     def IsAvailable(self, character):
         return not self.IsTrained or character.Skills[self.Key][0] > 0
 
-    def GetChanceOfSuccess(self, character, action):
-        if self.GetSkillCheck(character, action) == config.INFINITY:
+    def GetChanceOfSuccess(self, character, mainAction, subAction):
+        if self.GetSkillCheck(character, mainAction, subAction) == config.INFINITY:
             return 1
-        return 1 - (self.GetSkillCheck(action) - self.GetTotal(character)) / 20.0
+        return 1 - (self.GetSkillCheck(mainAction, subAction) - self.GetTotal(character)) / 20.0
 
     # Return INFINITY if no check is needed
-    def GetSkillCheck(self, character, action):
-        check = self.Actions[action]
+    def GetSkillCheck(self, character, mainAction, subAction):
+        check = self.Actions[mainAction][subAction]
         for key in self.ActiveModifiers:
             if self.ActiveModifiers[key]:
                 check += self.ModifierAmounts[key]
@@ -221,11 +186,31 @@ class Skill(object):
     def DeactivateModifer(self, modifer):
         self.ActiveModifiers[modifer] = False
 
+    def GetWebInfo(self):
+        if os.path.isfile(self.WebName + ".skl"):
+            with open(self.WebName + ".skl") as f:
+                return f.read()
+        else:
+            data = urllib2.urlopen("http://www.d20pfsrd.com/skills/" + self.WebName)
+            data = data.read()
+            soup = BeautifulSoup(data, 'html.parser')
+            soup = soup.main
+            [x.extract() for x in soup.findAll('script')]
+            [x.extract() for x in soup.findAll('a', {'class': 'bread-parent'})]
+            [x.extract() for x in soup.findAll('div', {'class': 'page-widget'})]
+            [x.extract() for x in soup.findAll('div', {'class': 'product-right'})]
+            REMOVE_ATTRIBUTES = ['border', 'cellpadding']
+            for tag in soup.recursiveChildGenerator():
+                if hasattr(tag, 'attrs'):
+                    tag.attrs = {key: value for key, value in tag.attrs.iteritems() if key not in REMOVE_ATTRIBUTES}
+            return str(soup)
+
 
 class acrobatics(Skill):
     Name = "Acrobatics"
     Ability = config.ABILITY_DEXTERITY
     UseACP = True
+    WebName = "acrobatics"
 
     def __init__(self, key):
         super(acrobatics, self).__init__(key)
@@ -249,25 +234,31 @@ class acrobatics(Skill):
         self.ActiveModifiers['Severely Unsteady'] = False
         self.ModifierAmounts['Balancing Pole'] = 1
         self.ActiveModifiers['Balancing Pole'] = False
+        self.ModifierAmounts['Long Pole'] = 2
+        self.ActiveModifiers['Long Pole'] = False
         self.ModifierAmounts['Move at full speed on narrow or uneven surfaces'] = 5
         self.ActiveModifiers['Move at full speed on narrow or uneven surfaces'] = False
-        self.Actions['Cross Narrow Surface/Uneven Ground (> 3 ft wide)'] = 0
-        self.Actions['Cross Narrow Surface/Uneven Ground (1-3 ft wide)'] = 5
-        self.Actions['Cross Narrow Surface/Uneven Ground (7-11 in wide)'] = 10
-        self.Actions['Cross Narrow Surface/Uneven Ground (2-6 in wide)'] = 15
-        self.Actions['Cross Narrow Surface/Uneven Ground (< 2 in wide)'] = 20
+        self.Actions['Cross Narrow Surface/Uneven Ground'] = {
+            '>3 ft wide': 0,
+            '1-3 ft wide': 5,
+            '7-11 in wide': 10,
+            '2-6 in wide': 15,
+            '< 2 in wide': 20
+        }
+        self.Actions['Long Jump'] = {
+        }
 
-    def GetSkillCheck(self, character, action):
-        check = super(acrobatics, self).GetSkillCheck(character, action)
-        if check < 10 and action in ['Cross Narrow Surface/Uneven Ground (> 3 ft wide)',
-                    'Cross Narrow Surface/Uneven Ground (1-3 ft wide)',
-                    'Cross Narrow Surface/Uneven Ground (7-11 in wide)',
-                    'Cross Narrow Surface/Uneven Ground (2-6 in wide)',
-                    'Cross Narrow Surface/Uneven Ground (< 2 in wide)']:
+    def GetSkillCheck(self, character, mainAction, subAction):
+        check = super(acrobatics, self).GetSkillCheck(character, mainAction, subAction)
+        if check < 10 and mainAction == 'Move at full speed on narrow or uneven surfaces' and subAction in [
+                    '> 3 ft wide',
+                    '1-3 ft wide'
+                ]:
             return config.INFINITY
 
 
 class appraise(Skill):
+    WebName = "appraise"
     Name = "Appraise"
     Ability = config.ABILITY_INTELLIGENCE
 
@@ -276,6 +267,7 @@ class appraise(Skill):
 
 
 class bluff(Skill):
+    WebName = "bluff"
     Name = "Bluff"
     Ability = config.ABILITY_CHARISMA
 
@@ -284,6 +276,7 @@ class bluff(Skill):
 
 
 class climb(Skill):
+    WebName = "climb"
     Name = "Climb"
     Ability = config.ABILITY_STRENGTH
     UseACP = True
@@ -293,6 +286,7 @@ class climb(Skill):
 
 
 class craft1(Skill):
+    WebName = "craft"
     Name = "Craft1"
     Ability = config.ABILITY_INTELLIGENCE
 
@@ -301,6 +295,7 @@ class craft1(Skill):
 
 
 class craft2(Skill):
+    WebName = "craft"
     Name = "Craft2"
     Ability = config.ABILITY_INTELLIGENCE
 
@@ -309,6 +304,7 @@ class craft2(Skill):
 
 
 class diplomacy(Skill):
+    WebName = "diplomacy"
     Name = "Diplomacy"
     Ability = config.ABILITY_CHARISMA
 
@@ -317,6 +313,7 @@ class diplomacy(Skill):
 
 
 class disable_device(Skill):
+    WebName = "disable-device"
     Name = "Disable Device"
     Ability = config.ABILITY_DEXTERITY
     IsTrained = True
@@ -327,6 +324,7 @@ class disable_device(Skill):
 
 
 class disguise(Skill):
+    WebName = "disguise"
     Name = "Disguise"
     Ability = config.ABILITY_CHARISMA
 
@@ -335,6 +333,7 @@ class disguise(Skill):
 
 
 class escape_artist(Skill):
+    WebName = "escape-artist"
     Name = "Escape Artist"
     Ability = config.ABILITY_DEXTERITY
     UseACP = True
@@ -344,6 +343,7 @@ class escape_artist(Skill):
 
 
 class fly(Skill):
+    WebName = "fly"
     Name = "Fly"
     Ability = config.ABILITY_DEXTERITY
     UseACP = True
@@ -353,6 +353,7 @@ class fly(Skill):
 
 
 class handle_animal(Skill):
+    WebName = "handle-animal"
     Name = "Handle Animal"
     Ability = config.ABILITY_CHARISMA
     IsTrained = True
@@ -362,6 +363,7 @@ class handle_animal(Skill):
 
 
 class heal(Skill):
+    WebName = "heal"
     Name = "Heal"
     Ability = config.ABILITY_WISDOM
 
@@ -370,6 +372,7 @@ class heal(Skill):
 
 
 class intimidate(Skill):
+    WebName = "intimidate"
     Name = "Intimidate"
     Ability = config.ABILITY_CHARISMA
 
@@ -378,6 +381,7 @@ class intimidate(Skill):
 
 
 class knowledge_arcana(Skill):
+    WebName = "knowledge"
     Name = "Knowledge Arcana"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -387,6 +391,7 @@ class knowledge_arcana(Skill):
 
 
 class knowledge_dungeoneering(Skill):
+    WebName = "knowledge"
     Name = "Knowledge Dungeoneering"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -396,6 +401,7 @@ class knowledge_dungeoneering(Skill):
 
 
 class knowledge_engineering(Skill):
+    WebName = "knowledge"
     Name = "Knowledge Engineering"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -405,6 +411,7 @@ class knowledge_engineering(Skill):
 
 
 class knowledge_geography(Skill):
+    WebName = "knowledge"
     Name = "Knowledge Geography"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -414,6 +421,7 @@ class knowledge_geography(Skill):
 
 
 class knowledge_history(Skill):
+    WebName = "knowledge"
     Name = "Knowledge History"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -423,6 +431,7 @@ class knowledge_history(Skill):
 
 
 class knowledge_local(Skill):
+    WebName = "knowledge"
     Name = "Knowledge Local"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -432,6 +441,7 @@ class knowledge_local(Skill):
 
 
 class knowledge_nature(Skill):
+    WebName = "knowledge"
     Name = "Knowledge Nature"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -441,6 +451,7 @@ class knowledge_nature(Skill):
 
 
 class knowledge_nobility(Skill):
+    WebName = "knowledge"
     Name = "Knowledge Nobility"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -450,6 +461,7 @@ class knowledge_nobility(Skill):
 
 
 class knowledge_planes(Skill):
+    WebName = "knowledge"
     Name = "Knowledge Planes"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -459,6 +471,7 @@ class knowledge_planes(Skill):
 
 
 class knowledge_religion(Skill):
+    WebName = "knowledge"
     Name = "Knowledge Religion"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -468,6 +481,7 @@ class knowledge_religion(Skill):
 
 
 class linguistics(Skill):
+    WebName = "linguistics"
     Name = "Linguistics"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -477,6 +491,7 @@ class linguistics(Skill):
 
 
 class perception(Skill):
+    WebName = "perception"
     Name = "Perception"
     Ability = config.ABILITY_WISDOM
 
@@ -485,6 +500,7 @@ class perception(Skill):
 
 
 class perform1(Skill):
+    WebName = "perform"
     Name = "Perform1"
     Ability = config.ABILITY_CHARISMA
 
@@ -493,6 +509,7 @@ class perform1(Skill):
 
 
 class perform2(Skill):
+    WebName = "perform"
     Name = "Perform2"
     Ability = config.ABILITY_CHARISMA
 
@@ -501,6 +518,7 @@ class perform2(Skill):
 
 
 class prof1(Skill):
+    WebName = "profession"
     Name = "Prof1"
     Ability = config.ABILITY_WISDOM
     IsTrained = True
@@ -510,6 +528,7 @@ class prof1(Skill):
 
 
 class prof2(Skill):
+    WebName = "profession"
     Name = "Prof2"
     Ability = config.ABILITY_WISDOM
     IsTrained = True
@@ -519,6 +538,7 @@ class prof2(Skill):
 
 
 class ride(Skill):
+    WebName = "ride"
     Name = "Ride"
     Ability = config.ABILITY_DEXTERITY
     UseACP = True
@@ -528,6 +548,7 @@ class ride(Skill):
 
 
 class sense_motive(Skill):
+    WebName = "sense-motive"
     Name = "Sense Motive"
     Ability = config.ABILITY_WISDOM
 
@@ -536,6 +557,7 @@ class sense_motive(Skill):
 
 
 class sleight_of_hand(Skill):
+    WebName = "sleight-of-hand"
     Name = "Sleight Of Hand"
     Ability = config.ABILITY_DEXTERITY
     IsTrained = True
@@ -546,6 +568,7 @@ class sleight_of_hand(Skill):
 
 
 class spellcraft(Skill):
+    WebName = "spellcraft"
     Name = "Spellcraft"
     Ability = config.ABILITY_INTELLIGENCE
     IsTrained = True
@@ -555,6 +578,7 @@ class spellcraft(Skill):
 
 
 class stealth(Skill):
+    WebName = "stealth"
     Name = "Stealth"
     Ability = config.ABILITY_DEXTERITY
     UseACP = True
@@ -564,6 +588,7 @@ class stealth(Skill):
 
 
 class survival(Skill):
+    WebName = "survival"
     Name = "Survival"
     Ability = config.ABILITY_WISDOM
 
@@ -572,6 +597,7 @@ class survival(Skill):
 
 
 class swim(Skill):
+    WebName = "swim"
     Name = "Swim"
     Ability = config.ABILITY_STRENGTH
     UseACP = True
@@ -581,6 +607,7 @@ class swim(Skill):
 
 
 class use_magic_device(Skill):
+    WebName = "use-magic-device"
     Name = "Use Magic Device"
     Ability = config.ABILITY_CHARISMA
     IsTrained = True
@@ -629,3 +656,10 @@ SkillClasses = {
     config.SKILL_SWIM: swim,
     config.SKILL_USE_MAGIC_DEVICE: use_magic_device
 }
+
+def saveWebInfo():
+    for skill in SkillClasses:
+        s = SkillClasses[skill](skill)
+        data = s.GetWebInfo()
+        with open(s.WebName + '.skl', 'w') as f:
+            f.write(data)

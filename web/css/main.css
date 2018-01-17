@@ -166,3 +166,28 @@ button:hover:enabled {
 .md-active {
 	color: #553900 !important;
 }
+
+.html-data {
+	margin: 20px;
+}
+
+.html-data h4 {
+	font-size: 18px;
+}
+
+a {
+	color: #806D15;
+}
+
+md-dialog-content {
+	background: #D4B16A;
+	color: #553900;
+}
+
+.section15, .section15 div {
+	background-color: #FFD1AA !important;
+    border: none !important;
+    color: #552700;
+    -webkit-box-shadow: 1px 2px 3px rgba(0,0,0,.5);
+
+}

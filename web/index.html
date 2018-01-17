@@ -32,8 +32,8 @@
         <div id="header" layout="column" ng-include="'header/header.html'"></div>
         <md-content layout="column" flex>
         	<div class="main" ui-view layout="column" flex>
-                <div layout="column" flex ng-controller="mainController" id="main-sheet-view" ng-hide="display!='main'" ng-include="'main/main-tall.html'" ng-hide="!isPortrait()" ng-show="isPortrait()"></div>
-		        <div layout="column" flex ng-controller="mainController" id="main-sheet-view" ng-hide="display!='main'" ng-include="'main/main-wide.html'" ng-hide="isPortrait()" ng-show="!isPortrait()"></div>
+                <div layout="column" flex ng-controller="mainController" id="main-sheet-view" ng-hide="display!='main' || !isPortrait()" ng-include="'main/main-tall.html'"></div>
+		        <div layout="column" flex ng-controller="mainController" id="main-sheet-view" ng-hide="display!='main' || isPortrait()" ng-include="'main/main-wide.html'"></div>
 		        <div layout="column" ng-controller="inventoryController" id="inventory-sheet-view" ng-hide="display!='inventory'" flex ng-include="'inventory/inventory.html'"></div>
 		        <div layout="column" ng-controller="spellController" id="spell-sheet-view" ng-hide="display!='spells'" flex ng-include="'spell/spell.html'"></div>
 		        <div layout="column" ng-controller="simulatorController" id="simulator-sheet-view" ng-hide="display!='simulator'" flex ng-include="'simulator/simulator.html'"></div>

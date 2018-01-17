@@ -623,13 +623,42 @@ class Handler(SimpleHTTPRequestHandler):
                     else:
                         self.Failure("Could not parse request")
                 elif query.startswith("/character/class"):
-                    # TODO
                     if query == "/character/class/add":
+                        # TODO
                         return
                     elif query == "/character/class/remove":
+                        # TODO
                         return
-                    elif query == "/character/class/level":
-                        return
+                    elif query == "/character/class/increase":
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'value' not in params or len(params['value']) < 1:
+                            self.Failure("No value provided")
+                        elif 'classidx' not in params or len(params['classidx']) < 1:
+                            self.Failure("No classidx provided")
+                        else:
+                            try:
+                                char.IncreaseClassLevel(int(params['classidx'][0]), int(params['value'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                self.Failure('Unable to parse amount')
+                    elif query == "/character/class/decrease":
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'value' not in params or len(params['value']) < 1:
+                            self.Failure("No value provided")
+                        elif 'classidx' not in params or len(params['classidx']) < 1:
+                            self.Failure("No classidx provided")
+                        else:
+                            try:
+                                char.DecreaseClassLevel(int(params['classidx'][0]), int(params['value'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                self.Failure('Unable to parse amount')
                     else:
                         self.Failure("Could not parse request")
                 elif query.startswith("/character/gold"):
@@ -737,13 +766,88 @@ class Handler(SimpleHTTPRequestHandler):
                                 traceback.print_exc()
                                 self.Failure('Unable to parse')
                     elif query == "/character/spell/learn":
-                        # TODO
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        elif 'classindex' not in params or len(params['classindex']) < 1:
+                            self.Failure("No classindex provided")
+                        if 'value' not in params or len(params['value']) < 1:
+                            self.Failure("No value provided")
+                        else:
+                            try:
+                                domain = False
+                                if 'domain' in params or len(params['domain']) > 0:
+                                    domain = params['domain'][0] == 'true'
+                                char.LearnSpell(int(params['classindex'][0]), spell.LoadSpellById(int(params['value'][0])))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
                         return
                     elif query == "/character/spell/forget":
-                        # TODO
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        elif 'classindex' not in params or len(params['classindex']) < 1:
+                            self.Failure("No classindex provided")
+                        elif 'level' not in params or len(params['level']) < 1:
+                            self.Failure("No level provided")
+                        elif 'spellidx' not in params or len(params['spellidx']) < 1:
+                            self.Failure("No spellidx provided")
+                        else:
+                            try:
+                                domain = False
+                                if 'domain' in params or len(params['domain']) > 0:
+                                    domain = params['domain'][0] == 'true'
+                                char.ForgetSpell(int(params['classindex'][0]), int(params['level'][0]), int(params['spellidx'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
+                        return
                         return
                     elif query == "/character/spell/prepare":
-                        # TODO
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        elif 'classindex' not in params or len(params['classindex']) < 1:
+                            self.Failure("No classindex provided")
+                        if 'value' not in params or len(params['value']) < 1:
+                            self.Failure("No value provided")
+                        else:
+                            try:
+                                domain = False
+                                if 'domain' in params or len(params['domain']) > 0:
+                                    domain = params['domain'][0] == 'true'
+                                char.PrepareSpell(int(params['classindex'][0]), spell.LoadSpellById(int(params['value'][0])), 0, domain)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
+                    elif query == "/character/spell/removeexisting":
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        elif 'classindex' not in params or len(params['classindex']) < 1:
+                            self.Failure("No classindex provided")
+                        elif 'level' not in params or len(params['level']) < 1:
+                            self.Failure("No level provided")
+                        elif 'spellidx' not in params or len(params['spellidx']) < 1:
+                            self.Failure("No spellidx provided")
+                        else:
+                            try:
+                                domain = False
+                                if 'domain' in params or len(params['domain']) > 0:
+                                    domain = params['domain'][0] == 'true'
+                                char.RemoveSpell(int(params['classindex'][0]), int(params['level'][0]), int(params['spellidx'][0]), domain)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
                         return
                     elif query == "/character/spell/prepareexisting":
                         char = GetCharacter(params['id'][0])
@@ -792,14 +896,47 @@ class Handler(SimpleHTTPRequestHandler):
                                 traceback.print_exc()
                                 self.Failure('Unable to parse')
                     elif query == "/character/spell/resetall":
-                        # TODO
-                        return
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        else:
+                            try:
+                                char.ResetSpells()
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
                     elif query == "/character/spell/resetclass":
-                        # TODO
-                        return
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'classindex' not in params or len(params['classindex']) < 1:
+                            self.Failure("No classindex provided")
+                        else:
+                            try:
+                                char.ResetClassSpellLevels(int(params['classindex'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
                     elif query == "/character/spell/resetlevel":
-                        # TODO
-                        return
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'classindex' not in params or len(params['classindex']) < 1:
+                            self.Failure("No classindex provided")
+                        elif 'level' not in params or len(params['level']) < 1:
+                            self.Failure("No level provided")
+                        else:
+                            try:
+                                char.ResetClassSpellLevel(int(params['classindex'][0]), int(params['level'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
                     else:
                         self.Failure("Could not parse request")
                 else:
@@ -894,6 +1031,29 @@ class Handler(SimpleHTTPRequestHandler):
                 self.Failure("No level provided")
             else:
                 spells = c.Classes[int(params['classidx'][0])][0].GetValidSpellsJson(int(params['level'][0]))
+                domain = False
+                if 'domain' in params and len(params['domain']) > 0:
+                    domain = params['domain'][0] == "true"
+                searchtext = ''
+                if 'searchtext' in params and len(params['searchtext']) > 0:
+                    searchtext = params['searchtext'][0].lower()
+                i = len(spells)-1
+                while i >= 0:
+                    if spells[i]['Name'].lower().find(searchtext) == -1:
+                        del spells[i]
+                        i -= 1
+                        continue
+                    if domain:
+                        if not spells[i]['IsDomainSpell']:
+                            del spells[i]
+                            i -= 1
+                            continue
+                    else:
+                        if not spells[i]['IsNormalSpell']:
+                            del spells[i]
+                            i -= 1
+                            continue
+                    i -= 1
                 self.send_response(200)
                 self.send_header('Content-Type', GetContentType('.json'))
                 self.end_headers()

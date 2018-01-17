@@ -149,6 +149,7 @@ if __name__ == '__main__':
         char.PrepareSpell(0, spell.LoadSpellByName('Spiritual Weapon'), 0)
         char.PrepareSpell(0, spell.LoadSpellByName('Speak with Dead'), 0, True)
         char.PrepareSpell(0, spell.LoadSpellByName('Inflict Serious Wounds'), 0)
-        char.AddDomain(0, config.DOMAIN_AIR)
+        char.AddDomain(0, config.DOMAIN_HEALING)
+        char.AddDomain(0, config.DOMAIN_KNOWLEDGE)
 
         pickle.dump(char, open(str(char.uuid) + '.chr', 'wb'))

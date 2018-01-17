@@ -633,6 +633,13 @@ class Character:
         if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
             self.Classes[classIdx][0].ForgetSpell(spLevel, spIdx)
 
+    def RemoveSpell(self, classIdx, spLevel, spIdx, domain=False):
+        if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
+            if isinstance(self.Classes[classIdx][0], characterclass.Cleric):
+                self.Classes[classIdx][0].RemoveSpell(spLevel, spIdx, domain)
+            else:
+                self.Classes[classIdx][0].RemoveSpell(spLevel, spIdx)
+
     def PrepareSpell(self, classIdx, sp, uses, domain=False):
         if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
             if isinstance(self.Classes[classIdx][0], characterclass.Cleric):
@@ -664,6 +671,18 @@ class Character:
     def UnPrepareSpells(self, classIdx, level=-1):
         if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
             self.Classes[classIdx][0].UnPrepareSpells(level)
+
+    def ResetClassSpellLevel(self, classIdx, level):
+        if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
+            self.Classes[classIdx][0].ResetDay(level)
+
+    def ResetClassSpellLevels(self, classIdx):
+        if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
+            self.Classes[classIdx][0].ResetDay()
+
+    def ResetSpells(self):
+        for i in range(len(self.Classes)):
+            self.ResetClassSpellLevels(i)
 
     def AddDomain(self, classIdx, domain):
         self.Classes[classIdx][0].AddDomain(domain)
@@ -1068,7 +1087,7 @@ class Character:
         j['Armor'] = {'Armor': self.Armor[0], 'Active': self.Armor[1]}
         j['Shield'] = {'Shield': self.Shield[0], 'Active': self.Shield[1]}
         j['MagicalProtection'] = [{'MagicalProtection': p[0], 'Active': p[1]} for p in self.MagicalProtection]
-        j['Skills'] = [{'SkillId': key, 'Skill': skill.GetSkillName(key), 'Ranks': self.Skills[key][0], 'Score': self.SkillScores()[key], 'Available': self.SkillIsAvailable()[key]} for key in skill.GetSkillNames()]
+        j['Skills'] = [{'SkillId': key, 'Skill': skill.GetSkillName(key), 'Description': skill.SkillClasses[key](key).GetWebInfo(), 'Ranks': self.Skills[key][0], 'Score': self.SkillScores()[key], 'Available': self.SkillIsAvailable()[key]} for key in skill.GetSkillNames()]
         j['SkillPointsLeft'] = self.SkillPointsLeft()
         j['TotalSkillPoints'] = self.TotalSkillPoints()
         j['Languages'] = self.Languages

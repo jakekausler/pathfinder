@@ -3180,6 +3180,27 @@ def LoadSpellByName(name):
     return ret
 
 
+def LoadSpellById(id):
+    global spellData
+    if not spellData:
+        LoadSpellDatabase()
+    ret = Spell()
+    if spellData and id > 0 and id <= len(spellData):
+        ret = Spell(spellData[id - 1])
+    return ret
+
+
+def IsDomainAtLevel(spell, level, domains=[]):
+    for domain in domains:
+        if domain in config.DomainSpells and level in config.DomainSpells[domain] and spell.Id in config.DomainSpells[domain][level]:
+            return True
+    return False
+
+
+def IsNormalAtLevel(spell, level, classType):
+    return classType in spell.SpellLevel and spell.SpellLevel[classType] == level
+
+
 def GetValidSpells(char, classIdx, level, domains=[]):
     global spellData
     if not spellData:
@@ -3188,6 +3209,8 @@ def GetValidSpells(char, classIdx, level, domains=[]):
     for spell in spellData:
         if Spell(spell).GetSpellLevel(char.Classes[classIdx][0], domains) == level:
             retVal.append(Spell(spell))
+            retVal[-1].IsDomainSpell = IsDomainAtLevel(retVal[-1], level, domains)
+            retVal[-1].IsNormalSpell = IsNormalAtLevel(retVal[-1], level, char.Classes[classIdx][0].Type)
     return retVal
 
 
@@ -3220,6 +3243,8 @@ class Spell:
         self.SavingThrow = []  # List of saving throw
         self.Description = ""
         self.Source = config.NONE
+        self.IsDomainSpell = False
+        self.IsNormalSpell = False
         if data:
             self.ParseData(data)
 
@@ -3303,7 +3328,7 @@ class Spell:
             print ret
         return ret
 
-    def ToJson(self, level, modifier, spLevel):
+    def ToJson(self, level, modifier, spLevel, classType, domains=[]):
         j = {}
         j['Id'] = self.Id
         j['Name'] = self.Name
@@ -3332,6 +3357,8 @@ class Spell:
         j['Description'] = self.Description
         j['Source'] = GetSourceName(self.Source)
         j['SavingThrows'] = [s.ToJson(level, modifier, spLevel) for s in self.SavingThrow]
+        j['IsDomainSpell'] = self.IsDomainSpell if self.IsDomainSpell else False
+        j['IsNormalSpell'] = self.IsNormalSpell if self.IsNormalSpell else False
         return j
 
     def __eq__(self, other):

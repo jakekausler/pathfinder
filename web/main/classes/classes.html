@@ -13,7 +13,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="c in character.Classes" ng-click="showClassDialog(c)">
+				<tr ng-repeat="c in character.Classes" ng-click="showClassDialog($event, c.Class.Type, $index)">
 					<td>
 						<span>{{c.Class.Type}}</span>
 					</td>

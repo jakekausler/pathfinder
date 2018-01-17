@@ -7,6 +7,7 @@
 			<label>Ranks</label>
 			<input type="number" ng-model="skill.Ranks">
 		</md-input-container>
+		<div class="html-data" ng-bind-html="skill.Description"></div>
 	</md-dialog-content>
 	<md-dialog-buttons>
 		<md-button ng-click="save()">

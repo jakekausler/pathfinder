@@ -555,21 +555,25 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
             };
         }
 
-        $scope.showClassDialog = function($event) {
-            // TODO
+        $scope.showClassDialog = function($event, className, classIdx) {
+            console.log(className)
             $mdDialog.show({
                 targetEvent: $event,
                 locals: {
-                    parent: $scope
+                    parent: $scope,
+                    className: className,
+                    classIdx: classIdx
                 },
                 controller: ClassController,
-                templateUrl: 'main/'
+                templateUrl: 'main/classes/classdialog.html'
             });
         }
 
-        function ClassController($scope, $mdDialog, $mdToast, $http, parent) {
-            // TODO
+        function ClassController($scope, $mdDialog, $mdToast, $http, parent, className, classIdx) {
             $scope.parent = parent;
+            $scope.className = className;
+            $scope.classIdx = classIdx;
+            $scope.amount = 0;
             $scope.cancel = function() {
                 $mdDialog.hide();
             };
@@ -578,10 +582,12 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
             };
             $scope.save = function(type) {
                 $http({
-                    url: 'character/' + type,
+                    url: 'character/class/' + type,
                     method: 'POST',
                     params: {
-                        id: $scope.parent.character.Id
+                        id: $scope.parent.character.Id,
+                        value: $scope.amount,
+                        classidx: $scope.classIdx
                     }
                 }).then(function(response) {
                     $mdToast.showSimple("Success: " + response.data);
@@ -745,7 +751,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
             };
         }
 
-        $scope.showSpellDialog = function($event, classIndex, level, idx, domain) {
+        $scope.showSpellDialog = function($event, classIndex, level, idx, mustPrepare, domain) {
             if (domain) {
                 idx = 0;
             }
@@ -756,24 +762,22 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
                     classIndex: classIndex,
                     level: level,
                     idx: idx,
+                    mustPrepare: mustPrepare,
                     domain: domain
                 },
-                controller: SpellController,
+                controller: PrepareUseSpellController,
                 templateUrl: 'spell/spelldialog.html'
             });
         }
 
-        function SpellController($scope, $mdDialog, $mdToast, $http, parent, classIndex, level, idx, domain) {
+        function PrepareUseSpellController($scope, $mdDialog, $mdToast, $http, parent, classIndex, level, idx, mustPrepare, domain) {
             $scope.parent = parent;
             $scope.classIndex = classIndex;
             $scope.level = level;
             $scope.idx = idx;
+            $scope.mustPrepare = mustPrepare;
             $scope.domain = domain == true;
             $scope.amount = 0
-            console.log("Class: " + classIndex);
-            console.log("Level: " + level);
-            console.log("Idx: " + idx);
-            console.log("Domain: " + $scope.domain);
             $scope.cancel = function() {
                 $mdDialog.hide();
             };
@@ -802,21 +806,50 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
             };
         }
 
-        $scope.showPrepareSpellDialog = function($event, level) {
+        $scope.showPrepareSpellDialog = function($event, classindex, level, hasDomains) {
             $mdDialog.show({
                 targetEvent: $event,
                 locals: {
                     parent: $scope,
-                    level: level
+                    level: level,
+                    classindex: classindex,
+                    hasDomains: hasDomains
                 },
                 controller: PrepareSpellController,
                 templateUrl: 'spell/preparespelldialog.html'
             });
         }
 
-        function PrepareSpellController($scope, $mdDialog, $mdToast, $http, parent, level) {
+        function PrepareSpellController($scope, $mdDialog, $mdToast, $http, parent, level, classindex, hasDomains) {
             $scope.parent = parent;
             $scope.level = level;
+            $scope.classindex = classindex;
+            $scope.domain = false;
+            $scope.hasDomains = hasDomains;
+            $scope.selectedItem = null;
+            $scope.searchText = null;
+            $scope.changeDomain = function() {
+                $scope.searchText = null;
+                $scope.selectedItem = null;
+            }
+            $scope.querySearch = function(query) {
+                return $scope.loadSpells(query);
+            }
+            $scope.loadSpells = function(query) {
+                return $http({
+                    url: 'spells',
+                    method: 'GET',
+                    params: {
+                        id: $scope.parent.character.Id,
+                        classidx: $scope.classindex,
+                        level: $scope.level,
+                        domain: $scope.domain ? 'true' : 'false',
+                        searchtext: query
+                    }
+                }).then(function(response) {
+                    return response.data;
+                });
+            }
             $scope.cancel = function() {
                 $mdDialog.hide();
             };
@@ -825,10 +858,13 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
             };
             $scope.save = function(type) {
                 $http({
-                    url: 'character/spell/' + type,
+                    url: 'character/spell/prepare',
                     method: 'POST',
                     params: {
-                        id: $scope.parent.character.Id
+                        id: $scope.parent.character.Id,
+                        classindex: $scope.classindex,
+                        domain: $scope.domain,
+                        value: $scope.selectedItem.Id
                     }
                 }).then(function(response) {
                     $mdToast.showSimple("Success: " + response.data);
@@ -840,21 +876,50 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
             };
         }
 
-        $scope.showKnowSpellDialog = function($event) {
-            // TODO
+        $scope.showLearnSpellDialog = function($event, classindex, level, hasDomains) {
             $mdDialog.show({
                 targetEvent: $event,
                 locals: {
-                    parent: $scope
+                    parent: $scope,
+                    level: level,
+                    classindex: classindex,
+                    hasDomains: hasDomains
                 },
-                controller: KnowSpellController,
+                controller: LearnSpellController,
                 templateUrl: 'spell/learnspelldialog.html'
             });
         }
 
-        function KnowSpellController($scope, $mdDialog, $mdToast, $http, parent) {
-            // TODO
+        function LearnSpellController($scope, $mdDialog, $mdToast, $http, parent, level, classindex, hasDomains) {
             $scope.parent = parent;
+            $scope.level = level;
+            $scope.classindex = classindex;
+            $scope.domain = false;
+            $scope.hasDomains = hasDomains;
+            $scope.selectedItem = null;
+            $scope.searchText = null;
+            $scope.changeDomain = function() {
+                $scope.searchText = null;
+                $scope.selectedItem = null;
+            }
+            $scope.querySearch = function(query) {
+                return $scope.loadSpells(query);
+            }
+            $scope.loadSpells = function(query) {
+                return $http({
+                    url: 'spells',
+                    method: 'GET',
+                    params: {
+                        id: $scope.parent.character.Id,
+                        classidx: $scope.classindex,
+                        level: $scope.level,
+                        domain: $scope.domain ? 'true' : 'false',
+                        searchtext: query
+                    }
+                }).then(function(response) {
+                    return response.data;
+                });
+            }
             $scope.cancel = function() {
                 $mdDialog.hide();
             };
@@ -863,10 +928,13 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
             };
             $scope.save = function(type) {
                 $http({
-                    url: 'character/' + type,
+                    url: 'character/spell/learn',
                     method: 'POST',
                     params: {
-                        id: $scope.parent.character.Id
+                        id: $scope.parent.character.Id,
+                        classindex: $scope.classindex,
+                        domain: $scope.domain,
+                        value: $scope.selectedItem.Id
                     }
                 }).then(function(response) {
                     $mdToast.showSimple("Success: " + response.data);
@@ -877,6 +945,55 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
                 });
             };
         }
+
+        $scope.resetAllClasses = function() {
+            $http({
+                url: 'character/spell/resetall',
+                method: 'POST',
+                params: {
+                    id: $scope.character.Id
+                }
+            }).then(function(response) {
+                $mdToast.showSimple("Success: " + response.data);
+                $scope.updateCharacter();
+            }, function(response) {
+                $mdToast.showSimple("Failed: " + response.data);
+            });
+        }
+
+        $scope.resetClass = function(classIdx) {
+            $http({
+                url: 'character/spell/resetclass',
+                method: 'POST',
+                params: {
+                    id: $scope.character.Id,
+                    classindex: classIdx
+                }
+            }).then(function(response) {
+                $mdToast.showSimple("Success: " + response.data);
+                $scope.updateCharacter();
+            }, function(response) {
+                $mdToast.showSimple("Failed: " + response.data);
+            });
+        }
+
+        $scope.resetLevel = function(classIdx, level) {
+            $http({
+                url: 'character/spell/resetlevel',
+                method: 'POST',
+                params: {
+                    id: $scope.character.Id,
+                    classindex: classIdx,
+                    level: level
+                }
+            }).then(function(response) {
+                $mdToast.showSimple("Success: " + response.data);
+                $scope.updateCharacter();
+            }, function(response) {
+                $mdToast.showSimple("Failed: " + response.data);
+            });
+        }
+
 
         $scope.updateName = function() {
             $http({

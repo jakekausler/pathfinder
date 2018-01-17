@@ -3,10 +3,22 @@
 		<span class="md-display-1">
 			Prepare Spell
 		</span>
+		<md-checkbox ng-show="hasDomains" ng-model="domain" ng-click="changeDomain()">Domain Spells</md-checkbox>
 		<md-input-container>
-			<label>Amount</label>
-			<input type="number" ng-model="amount">
+			<md-autocomplete md-no-cache="true" md-selected-item="selectedItem" md-search-text="searchText" md-items="spell in querySearch(searchText)" md-item-text="spell.Name" placeholder="Select a spell">
+				<md-item-template>
+					<span md-highlight-text="searchText" md-highlight-flags="^i">
+						{{spell.Name}}
+					</span>
+				</md-item-template>
+				<md-not-found>
+					No spells matching "{{searchText}}" were found.
+				</md-not-found>
+			</md-autocomplete>
 		</md-input-container>
+		<md-content>
+			<div ng-bind-html="selectedItem.Description"></div>
+		</md-content>
 	</md-dialog-content>
 	<md-dialog-buttons>
 		<md-button ng-click="save('prepare')">
