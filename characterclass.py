@@ -469,6 +469,7 @@ class Cleric(SpellcastingClass):
                         config.SKILL_KNOWLEDGE_LOCAL,
                         config.SKILL_KNOWLEDGE_NATURE
             ]
+        return s in skills
 
     def AddDomain(self, domain):
         self.Domains.append(domain)

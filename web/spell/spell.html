@@ -48,7 +48,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="spell in characterSpells[class.Class.Type][i]" ng-click="showSpellDialog($event, classIndex, i, $index, class.Class.MustPrepare, spell.IsDomain)">
+							<tr ng-repeat="spell in characterSpells[class.Class.Type][i]" ng-click="showSpellDialog($event, classIndex, i, $index, class.Class.MustPrepare, spell.IsDomain, spell.Description)">
 								<td ng-hide="class.Class.DomainSpells == undefined" style='text-align: center'>
 									<span>{{spell.IsDomain ? "Yes" : ""}}</span>
 								</td>

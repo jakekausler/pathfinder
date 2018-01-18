@@ -116,7 +116,7 @@ md-content {
 	color: #553900;
 }
 
-md-toolbar {
+md-toolbar, md-dialog-buttons {
 	background: #AA8439 !important;
 }
 

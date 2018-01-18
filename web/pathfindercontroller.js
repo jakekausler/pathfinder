@@ -1,5 +1,5 @@
-angular.module('pathfinder', ['ngMaterial','ngSanitize'])
-	.config(function($mdThemingProvider) {
+angular.module('pathfinder', ['ngMaterial', 'ngSanitize'])
+    .config(function($mdThemingProvider) {
         $mdThemingProvider.theme('default')
             .primaryPalette('indigo')
             .accentPalette('pink')
@@ -8,8 +8,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
     })
     .controller('pathfinderController', function($scope, $http, $mdToast, $mdMedia, $mdDialog) {
         $scope.display = 'main';
-        $scope.chooseCharacter = function() {
-        }
+        $scope.chooseCharacter = function() {}
         $scope.main = function() {
             $scope.display = 'main';
         }
@@ -65,14 +64,14 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
                 $scope.characterSpells[cls.Type] = []
                 if (cls.MustPrepare) {
                     $scope.characterSpells[cls.Type] = cls.PreparedSpells;
-                    for (var i=0; i<10; i++) {
-                        for (var j=0; j<cls.PreparedSpells[i].length; j++) {
+                    for (var i = 0; i < 10; i++) {
+                        for (var j = 0; j < cls.PreparedSpells[i].length; j++) {
                             $scope.characterSpells[cls.Type][i][j].Spell.UsesLeft = $scope.characterSpells[cls.Type][i][j].Uses
                             $scope.characterSpells[cls.Type][i][j] = $scope.characterSpells[cls.Type][i][j].Spell
                         }
                         if (cls.DomainSpells) {
                             $scope.characterSpells[cls.Type][i].push.apply($scope.characterSpells[cls.Type][i], cls.DomainSpells[i])
-                            for (var j=$scope.characterSpells[cls.Type][i].length-cls.DomainSpells[i].length; j<$scope.characterSpells[cls.Type][i].length + cls.DomainSpells[i].length-1; j++) {
+                            for (var j = $scope.characterSpells[cls.Type][i].length - cls.DomainSpells[i].length; j < $scope.characterSpells[cls.Type][i].length; j++) {
                                 $scope.characterSpells[cls.Type][i][j].Spell.IsDomain = true
                                 $scope.characterSpells[cls.Type][i][j].Spell.UsesLeft = $scope.characterSpells[cls.Type][i][j].Uses
                                 $scope.characterSpells[cls.Type][i][j] = $scope.characterSpells[cls.Type][i][j].Spell
@@ -83,67 +82,67 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
                     $scope.characterSpells[cls.Type] = cls.KnownSpells
                 }
             }
+        }
 
-            $scope.getSpellDescriptors = function(spell) {
-                ret = ""
-                if (spell.School) {
-                    ret += spell.School
-                }
-                if (spell.Subschools.length > 0) {
-                    ret += " (" + spell.Subschools.join(",") + ")"
-                }
-                if (spell.Descriptors.length > 0) {
-                    ret += " [" + spell.Descriptors.join(",") + "]"
-                }
-                return ret
+        $scope.getSpellDescriptors = function(spell) {
+            ret = ""
+            if (spell.School) {
+                ret += spell.School
             }
+            if (spell.Subschools.length > 0) {
+                ret += " (" + spell.Subschools.join(",") + ")"
+            }
+            if (spell.Descriptors.length > 0) {
+                ret += " [" + spell.Descriptors.join(",") + "]"
+            }
+            return ret
+        }
 
-            $scope.getComponents = function(spell, UseDivineComponent) {
-                ret = ""
-                if (spell.VerbalComponent) {
-                    if (ret != "") {
-                        ret += ", "
-                    }
-                    ret += "V"
+        $scope.getComponents = function(spell, UseDivineComponent) {
+            ret = ""
+            if (spell.VerbalComponent) {
+                if (ret != "") {
+                    ret += ", "
                 }
-                if (spell.SomaticComponent) {
-                    if (ret != "") {
-                        ret += ", "
-                    }
-                    ret += "S"
-                }
-                if (spell.DivineFocusComponent.DivineFocusComponent[0] && UseDivineComponent) {
-                    if (ret != "") {
-                        ret += ", "
-                    }
-                    ret += "DF"
-                } else {
-                    materials = []
-                    if (spell.MaterialComponent.MaterialComponent[0]) {
-                        if (ret != "") {
-                            ret += ", "
-                        }
-                        ret += "M"
-                        materials = spell.MaterialComponent.MaterialComponent[1]
-                    }
-                    if (spell.FocusComponent.FocusComponent[0]) {
-                        if (ret != "") {
-                            ret += ", "
-                        }
-                        ret += "F"
-                        materials = spell.FocusComponent.FocusComponent[1]
-                    }
-                    if (materials.length > 0) {
-                        ret += " (" + materials.join("; ") + ")"
-                    }
-                }
-                return ret
+                ret += "V"
             }
+            if (spell.SomaticComponent) {
+                if (ret != "") {
+                    ret += ", "
+                }
+                ret += "S"
+            }
+            if (spell.DivineFocusComponent.DivineFocusComponent[0] && UseDivineComponent) {
+                if (ret != "") {
+                    ret += ", "
+                }
+                ret += "DF"
+            } else {
+                materials = []
+                if (spell.MaterialComponent.MaterialComponent[0]) {
+                    if (ret != "") {
+                        ret += ", "
+                    }
+                    ret += "M"
+                    materials = spell.MaterialComponent.MaterialComponent[1]
+                }
+                if (spell.FocusComponent.FocusComponent[0]) {
+                    if (ret != "") {
+                        ret += ", "
+                    }
+                    ret += "F"
+                    materials = spell.FocusComponent.FocusComponent[1]
+                }
+                if (materials.length > 0) {
+                    ret += " (" + materials.join("; ") + ")"
+                }
+            }
+            return ret
         }
 
         $scope.getNumberArray = function(n) {
             var arr = []
-            for (i=0; i<n; i++) {
+            for (i = 0; i < n; i++) {
                 arr.push(i)
             }
             return arr
@@ -155,6 +154,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showSkillDialog = function($event, skillIdx) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     skill: $scope.character.Skills[skillIdx],
@@ -195,6 +195,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showDamageDialog = function($event) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -233,6 +234,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showAbilityDialog = function($event, key) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope,
@@ -274,6 +276,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showLanguageDialog = function($event) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -313,6 +316,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
         $scope.showWeaponDialog = function($event) {
             // TODO
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -351,6 +355,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
         $scope.showArmorDialog = function($event) {
             // TODO
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -389,6 +394,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
         $scope.showShieldDialog = function($event) {
             // TODO
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -427,6 +433,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
         $scope.showMagicalProtectiveDialog = function($event) {
             // TODO
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -464,6 +471,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showFeatDialog = function($event, idx) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope,
@@ -503,6 +511,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showAddFeatDialog = function($event) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -558,6 +567,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
         $scope.showClassDialog = function($event, className, classIdx) {
             console.log(className)
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope,
@@ -601,6 +611,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showGoldDialog = function($event) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -639,6 +650,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showExperienceDialog = function($event) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -678,6 +690,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
         $scope.showEquipmentDialog = function($event) {
             // TODO
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -716,6 +729,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
         $scope.showItemsDialog = function($event) {
             // TODO
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope
@@ -751,11 +765,12 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
             };
         }
 
-        $scope.showSpellDialog = function($event, classIndex, level, idx, mustPrepare, domain) {
+        $scope.showSpellDialog = function($event, classIndex, level, idx, mustPrepare, domain, description) {
             if (domain) {
                 idx = 0;
             }
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope,
@@ -763,14 +778,15 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
                     level: level,
                     idx: idx,
                     mustPrepare: mustPrepare,
-                    domain: domain
+                    domain: domain,
+                    description: description
                 },
                 controller: PrepareUseSpellController,
                 templateUrl: 'spell/spelldialog.html'
             });
         }
 
-        function PrepareUseSpellController($scope, $mdDialog, $mdToast, $http, parent, classIndex, level, idx, mustPrepare, domain) {
+        function PrepareUseSpellController($scope, $mdDialog, $mdToast, $http, parent, classIndex, level, idx, mustPrepare, domain, description) {
             $scope.parent = parent;
             $scope.classIndex = classIndex;
             $scope.level = level;
@@ -778,6 +794,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
             $scope.mustPrepare = mustPrepare;
             $scope.domain = domain == true;
             $scope.amount = 0
+            $scope.description = description;
             $scope.cancel = function() {
                 $mdDialog.hide();
             };
@@ -808,6 +825,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showPrepareSpellDialog = function($event, classindex, level, hasDomains) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope,
@@ -878,6 +896,7 @@ angular.module('pathfinder', ['ngMaterial','ngSanitize'])
 
         $scope.showLearnSpellDialog = function($event, classindex, level, hasDomains) {
             $mdDialog.show({
+                clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
                     parent: $scope,
