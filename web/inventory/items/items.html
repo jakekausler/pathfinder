@@ -1,4 +1,5 @@
 <span class="md-display-1">Inventory</span>
+<md-button ng-click="showNewItemDialog()"></md-button>
 <md-content layout-padding>
 	<md-table-container>
 		<table style="width: 100%">
@@ -16,21 +17,45 @@
 					<th style='text-align: center'>
 						<span>Weight</span>
 					</th>
+					<th style='text-align: center'>
+						<span></span>
+					</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="i in character.Inventory.Items" ng-click="showItemsDialog(i)">
-					<td style='text-align: center'>
+				<tr ng-repeat="i in character.Inventory.Items">
+					<td style='text-align: center' ng-click="showItemsDialog($event, i, $index)">
 						<span>{{i.Quantity}}</span>
 					</td>
-					<td>
+					<td ng-click="showItemsDialog($event, i, $index)">
 						<span>{{i.Item.Name}}</span>
 					</td>
-					<td style='text-align: center'>
+					<td style='text-align: center' ng-click="showItemsDialog($event, i, $index)">
 						<span>{{i.Item.Value}} gp</span>
 					</td>
-					<td style='text-align: center'>
+					<td style='text-align: center' ng-click="showItemsDialog($event, i, $index)">
 						<span>{{i.Item.Weight}} lbs</span>
+					</td>
+					<td style='text-align: center'>
+						<md-button ng-click="showEquipDialog($event, i.Item, $index)" ng-show="i.Item.IsWearable && i.Item.EquippedAtSlot[0] == -1">Equip</md-button>
+						<md-button ng-click="unequip($event, i.Item)" ng-show="i.Item.IsWearable && i.Item.EquippedAtSlot[0] != -1">Unequip</md-button>
+					</td>
+				</tr>
+				<tr ng-click="showNewItemDialog($event)">
+					<td style='text-align: center'>
+						<span>&nbsp;</span>
+					</td>
+					<td>
+						<span>&nbsp;</span>
+					</td>
+					<td style='text-align: center'>
+						<span>&nbsp;</span>
+					</td>
+					<td style='text-align: center'>
+						<span>&nbsp;</span>
+					</td>
+					<td style='text-align: center'>
+						<span>&nbsp;</span>
 					</td>
 				</tr>
 				<tr>
@@ -43,6 +68,8 @@
 					</td>
 					<td style='text-align: center'>
 						<span><b>{{character.Inventory.TotalWeight}} lbs</b></span>
+					</td>
+					<td>
 					</td>
 				</tr>
 			</tbody>

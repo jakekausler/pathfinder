@@ -2,9 +2,6 @@
 	<thead>
 		<tr>
 			<th style='text-align: center'>
-				<span>Active</span>
-			</th>
-			<th style='text-align: center'>
 				<span>Weapons</span>
 			</th>
 			<th style='text-align: center'>
@@ -22,44 +19,21 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="w in character.Weapons" ng-click="showWeaponDialog(w)">
-			<td style='text-align: center'>
-				<span>{{w.Active}}</span>
-			</td>
+		<tr ng-repeat="w in character.Weapons">
 			<td>
-				<span>{{w.Weapon.Name}}</span>
+				<span>{{w.Name}}</span>
 			</td>
 			<td style='text-align: center'>
-				<span>{{w.Weapon.Attacks}}</span>
+				<span>{{w.Attacks}}<span ng-show="w.CanThrow"> (Thrown: {{w.ThrowAttacks}})</span></span>
 			</td>
 			<td style='text-align: center'>
-				<span>{{w.Weapon.Damage}}</span>
+				<span>{{w.Damage}}<span ng-show="w.CanThrow"> (Thrown: {{w.ThrowDamage}})</span></span>
 			</td>
 			<td style='text-align: center'>
-				<span>{{w.Weapon.Critical}}</span>
+				<span>{{w.Critical}}<span ng-show="w.CanThrow"> (Thrown: {{w.ThrowCritical}})</span></span>
 			</td>
 			<td style='text-align: center'>
-				<span>{{w.Weapon.Range}}</span>
-			</td>
-		</tr>
-		<tr ng-click="showClassDialog(-1)">
-			<td>
-				<span>&nbsp;</span>
-			</td>
-			<td>
-				<span>&nbsp;</span>
-			</td>
-			<td style='text-align: center'>
-				<span>&nbsp;</span>
-			</td>
-			<td style='text-align: center'>
-				<span>&nbsp;</span>
-			</td>
-			<td style='text-align: center'>
-				<span>&nbsp;</span>
-			</td>
-			<td style='text-align: center'>
-				<span>&nbsp;</span>
+				<span>{{w.Range}}</span>
 			</td>
 		</tr>
 	</tbody>

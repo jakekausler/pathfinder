@@ -1,0 +1,25 @@
+<md-dialog aria-label="FC Skill Dialog">
+	<md-dialog-content>
+		<span class="md-display-1">
+			Apply FC Points
+		</span>
+		<md-input-container>
+			<label>Skill</label>
+			<md-select ng-model="skill" md-on-open="loadSkills()">
+				<md-option ng-repeat="type in skills" ng-value="type.Id">{{type.Name}}</md-option>
+			</md-select>
+		</md-input-container>
+		<md-input-container>
+			<label>Amount</label>
+			<input type="number" ng-model="amount">
+		</md-input-container>
+	</md-dialog-content>
+	<md-dialog-buttons>
+		<md-button ng-disabled="skill < 0" ng-click="save()">
+			Add ({{parent.character.FavoredClassPointsLeft}} Left)
+		</md-button>
+		<md-button ng-click="cancel()">
+			Cancel
+		</md-button>
+	</md-dialog-buttons>
+</md-dialog>

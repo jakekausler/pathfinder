@@ -13,15 +13,17 @@ import os
 import json
 import traceback
 import pickle
+import re
 
 import config
 import alignment
 import race
 import size
-import characterclass
 import color
 import spell
 import feat
+import item
+import roll
 
 PORT = 8080
 WEBROOT = 'web'
@@ -68,12 +70,16 @@ class Handler(SimpleHTTPRequestHandler):
             self.ServeRaces()
         elif fn == 'web/classes':
             self.ServeClasses()
+        elif fn == 'web/skills':
+            self.ServeSkills()
         elif fn == 'web/colors':
             self.ServeColors()
         elif fn == 'web/spells':
             self.ServeSpells()
         elif fn == 'web/feats':
             self.ServeFeats()
+        elif fn == 'web/equipableitems':
+            self.ServeEquipableItems()
         elif os.access(fn, os.R_OK):
             self.ServeFile(fn)
         else:
@@ -107,6 +113,24 @@ class Handler(SimpleHTTPRequestHandler):
                                 traceback.print_exc()
                                 self.Failure("Could not save character")
                         self.Failure("Failed to save character")
+                elif query == "/character/skill/applyfcpoints":
+                    char = GetCharacter(params['id'][0])
+                    if not char:
+                        self.Failure("Character not found")
+                    if 'value' not in params or len(params['value']) < 1:
+                        self.Failure("No value provided")
+                    if 'skillid' not in params or len(params['skillid']) < 1:
+                        self.Failure("No skillid provided")
+                    else:
+                        try:
+                            char.AddFavoredClassSkill(int(params['skillid'][0]), int(params['value'][0]))
+                            SaveCharacter(char)
+                            self.Success('Success')
+                        except ValueError:
+                            self.Failure("Unable to convert to int")
+                        except Exception:
+                            traceback.print_exc()
+                            self.Failure("Unable to save character")
                 elif query.startswith("/character/health/"):
                     if query == "/character/health/damage":
                         char = GetCharacter(params['id'][0])
@@ -165,6 +189,22 @@ class Handler(SimpleHTTPRequestHandler):
                         else:
                             try:
                                 char.HealNonLethal(int(params['amount'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except ValueError:
+                                self.Failure("Unable to convert amount to int")
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure("Unable to save character")
+                    elif query == "/character/health/applyfcpoints":
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'amount' not in params or len(params['amount']) < 1:
+                            self.Failure("No amount provided")
+                        else:
+                            try:
+                                char.AddFavoredClassHP(int(params['amount'][0]))
                                 SaveCharacter(char)
                                 self.Success('Success')
                             except ValueError:
@@ -314,54 +354,6 @@ class Handler(SimpleHTTPRequestHandler):
                                 self.Failure("Unable to forget language")
                         else:
                             self.Failure("No value provided")
-                    else:
-                        self.Failure("Could not parse request")
-                elif query.startswith("/character/weapon"):
-                    # TODO
-                    if query == "/character/weapon/activate":
-                        return
-                    elif query == "/character/weapon/deactivate":
-                        return
-                    elif query == "/character/weapon/remove":
-                        return
-                    elif query == "/character/weapon/add":
-                        return
-                    else:
-                        self.Failure("Could not parse request")
-                elif query.startswith("/character/armor"):
-                    # TODO
-                    if query == "/character/armor/activate":
-                        return
-                    elif query == "/character/armor/deactivate":
-                        return
-                    elif query == "/character/armor/remove":
-                        return
-                    elif query == "/character/armor/add":
-                        return
-                    else:
-                        self.Failure("Could not parse request")
-                elif query.startswith("/character/shield"):
-                    # TODO
-                    if query == "/character/shield/activate":
-                        return
-                    elif query == "/character/shield/deactivate":
-                        return
-                    elif query == "/character/shield/remove":
-                        return
-                    elif query == "/character/shield/add":
-                        return
-                    else:
-                        self.Failure("Could not parse request")
-                elif query.startswith("/character/magicalprotective"):
-                    # TODO
-                    if query == "/character/magicalprotective/activate":
-                        return
-                    elif query == "/character/magicalprotective/deactivate":
-                        return
-                    elif query == "/character/magicalprotective/remove":
-                        return
-                    elif query == "/character/magicalprotective/add":
-                        return
                     else:
                         self.Failure("Could not parse request")
                 elif query.startswith("/character/feat"):
@@ -550,6 +542,7 @@ class Handler(SimpleHTTPRequestHandler):
                                     SaveCharacter(char)
                                     self.Success('Success')
                                 except Exception:
+                                    traceback.print_exc()
                                     self.Failure('Unable to parse age')
                         else:
                             self.Failure("Could not parse request")
@@ -566,6 +559,7 @@ class Handler(SimpleHTTPRequestHandler):
                                     SaveCharacter(char)
                                     self.Success('Success')
                                 except Exception:
+                                    traceback.print_exc()
                                     self.Failure('Unable to parse age')
                         else:
                             self.Failure("Could not parse request")
@@ -624,11 +618,34 @@ class Handler(SimpleHTTPRequestHandler):
                         self.Failure("Could not parse request")
                 elif query.startswith("/character/class"):
                     if query == "/character/class/add":
-                        # TODO
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        elif 'classidx' not in params or len(params['classidx']) < 1:
+                            self.Failure("No classidx provided")
+                        else:
+                            try:
+                                char.AddClass(int(params['classidx'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse amount')
                         return
                     elif query == "/character/class/remove":
-                        # TODO
-                        return
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        elif 'classidx' not in params or len(params['classidx']) < 1:
+                            self.Failure("No classidx provided")
+                        else:
+                            try:
+                                char.RemoveClass(int(params['classidx'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse amount')
                     elif query == "/character/class/increase":
                         char = GetCharacter(params['id'][0])
                         if not char:
@@ -643,6 +660,7 @@ class Handler(SimpleHTTPRequestHandler):
                                 SaveCharacter(char)
                                 self.Success('Success')
                             except Exception:
+                                traceback.print_exc()
                                 self.Failure('Unable to parse amount')
                     elif query == "/character/class/decrease":
                         char = GetCharacter(params['id'][0])
@@ -658,6 +676,7 @@ class Handler(SimpleHTTPRequestHandler):
                                 SaveCharacter(char)
                                 self.Success('Success')
                             except Exception:
+                                traceback.print_exc()
                                 self.Failure('Unable to parse amount')
                     else:
                         self.Failure("Could not parse request")
@@ -674,6 +693,7 @@ class Handler(SimpleHTTPRequestHandler):
                                 SaveCharacter(char)
                                 self.Success('Success')
                             except Exception:
+                                traceback.print_exc()
                                 self.Failure('Unable to parse amount')
                     elif query == "/character/gold/gain":
                         char = GetCharacter(params['id'][0])
@@ -687,6 +707,7 @@ class Handler(SimpleHTTPRequestHandler):
                                 SaveCharacter(char)
                                 self.Success('Success')
                             except Exception:
+                                traceback.print_exc()
                                 self.Failure('Unable to parse amount')
                     else:
                         self.Failure("Could not parse request")
@@ -703,6 +724,7 @@ class Handler(SimpleHTTPRequestHandler):
                                 SaveCharacter(char)
                                 self.Success('Success')
                             except Exception:
+                                traceback.print_exc()
                                 self.Failure('Unable to parse amount')
                     elif query == "/character/experience/reduce":
                         char = GetCharacter(params['id'][0])
@@ -716,29 +738,367 @@ class Handler(SimpleHTTPRequestHandler):
                                 SaveCharacter(char)
                                 self.Success('Success')
                             except Exception:
+                                traceback.print_exc()
                                 self.Failure('Unable to parse amount')
                     else:
                         self.Failure("Could not parse request")
                 elif query.startswith("/character/equipment"):
-                    # TODO
                     if query == "/character/equipment/equip":
-                        return
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'slot' not in params or len(params['slot']) < 1:
+                            self.Failure("No slot provided")
+                        elif 'itemid' not in params or len(params['itemid']) < 1:
+                            self.Failure("No itemid provided")
+                        else:
+                            try:
+                                char.Inventory.WearItem(int(params['itemid'][0]), int(params['slot'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
                     elif query == "/character/equipment/unequip":
-                        return
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'slot' not in params or len(params['slot']) < 1:
+                            self.Failure("No slot provided")
+                        else:
+                            try:
+                                char.Inventory.RemoveWornItem(int(params['slot'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
                     else:
                         self.Failure("Could not parse request")
                 elif query.startswith("/character/item"):
-                    # TODO
-                    if query == "/character/item/add":
-                        return
+                    if query.startswith("/character/item/add"):
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                            return
+                        if 'name' not in params or len(params['name']) < 1:
+                            self.Failure("No name provided")
+                            return
+                        if 'quantity' not in params or len(params['quantity']) < 1:
+                            self.Failure("No quantity provided")
+                            return
+                        if 'weight' not in params or len(params['weight']) < 1:
+                            self.Failure("No weight provided")
+                            return
+                        if 'value' not in params or len(params['value']) < 1:
+                            self.Failure("No value provided")
+                            return
+                        name = ''
+                        quantity = 0
+                        weight = 0
+                        value = 0
+                        try:
+                            name = params['name'][0]
+                            quantity = int(params['quantity'][0])
+                            weight = float(params['weight'][0])
+                            value = float(params['value'][0])
+                        except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
+                                return
+                        if query == "/character/item/add/item":
+                            char.Inventory.AddItem(item.Item(name, weight, value), quantity)
+                            SaveCharacter(char)
+                            self.Success('Success')
+                        elif query.startswith('/character/item/add/weapon'):
+                            if 'damage' not in params or len(params['damage']) < 1:
+                                self.Failure("No damage provided")
+                                return
+                            if 'critical' not in params or len(params['critical']) < 1:
+                                self.Failure("No critical provided")
+                                return
+                            if 'range' not in params or len(params['range']) < 1:
+                                self.Failure("No range provided")
+                                return
+                            if 'enchantment' not in params or len(params['enchantment']) < 1:
+                                self.Failure("No enchantment provided")
+                                return
+                            if 'size' not in params or len(params['size']) < 1:
+                                self.Failure("No size provided")
+                                return
+                            damage = ''
+                            critical = ''
+                            criticalRange = [20, 20]
+                            criticalMultiplier = 2
+                            range = 0
+                            types = config.NONE
+                            useAllTypes = False
+                            specials = config.NONE
+                            useAllSpecials = False
+                            twoHanded = False
+                            light = False
+                            martial = False
+                            exotic = False
+                            masterwork = False
+                            enchantment = False
+                            siz = size.Medium()
+                            try:
+                                damage = params['damage'][0]
+                                damage = damage.strip()
+                                if damage == '':
+                                    damage = roll.Dice(4, 1, addition=1)
+                                else:
+                                    r = re.compile(r'([0-9]+)d([0-9]+)( ?\+ ?([0-9]+))?')
+                                    m = r.match(damage)
+                                    if m:
+                                        if not (m.groups()[0] and m.groups()[1]):
+                                            raise Exception("Unable to parse damage")
+                                        addition = 0
+                                        if m.groups()[3]:
+                                            addition = int(m.groups()[3])
+                                        damage = roll.Dice(int(m.groups()[1]), int(m.groups()[0]), addition=addition)
+                                    else:
+                                        self.Failure("Unable to parse damage")
+                                        return
+                                critical = params['critical'][0]
+                                critical = critical.strip()
+                                if critical != '':
+                                    r = re.compile(r'((([0-9]+)-)?([0-9]+)/)?x([0-9]+)')
+                                    m = r.match(critical)
+                                    if m:
+                                        if not m.groups()[4]:
+                                            raise Exception("Unable to parse critical")
+                                        if m.groups()[2]:
+                                            criticalRange[0] = int(m.groups()[2])
+                                        if m.groups()[3]:
+                                            criticalRange[1] = int(m.groups()[3])
+                                            if not m.groups()[2]:
+                                                criticalRange[0] = int(m.groups()[3])
+                                        criticalMultiplier = int(m.groups()[4])
+                                    else:
+                                        self.Failure("Unable to parse critical")
+                                        return
+                                range = float(params['weight'][0])
+                                if 'types' in params:
+                                    types = params['types']
+                                    t = config.NONE
+                                    for type in types:
+                                        t |= config.WeaponTypeDict[type]
+                                    types = t
+                                if 'usealltypes' in params:
+                                    useAllTypes = params['usealltypes'][0] == True
+                                if 'specials' in params:
+                                    specials = params['specials']
+                                    t = config.NONE
+                                    for type in specials:
+                                        t |= config.WeaponSpecialDict[type]
+                                    specials = t
+                                if 'useallspecials' in params:
+                                    useAllSpecials = params['useallspecials'][0] == True
+                                if 'twohanded' in params:
+                                    twoHanded = params['twohanded'][0] == True
+                                if 'light' in params:
+                                    light = params['light'][0] == True
+                                if 'martial' in params:
+                                    martial = params['martial'][0] == True
+                                if 'exotic' in params:
+                                    exotic = params['exotic'][0] == True
+                                if 'masterwork' in params:
+                                    masterwork = params['masterwork'][0] == True
+                                if 'enchantment' in params:
+                                    enchantment = int(params['enchantment'][0])
+                                if 'size' in params:
+                                    siz = size.sizeDict[config.SizeNameToId[params['size'][0]]]()
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
+                            if query == "/character/item/add/weapon/unarmed":
+                                cancelSlots = []
+                                applicableSlots = []
+                                if 'applicableslots' in params:
+                                    applicableSlots = params['applicableslots']
+                                if 'cancelsslots' in params:
+                                    cancelSlots = params['cancelsslots']
+                                char.Inventory.AddItem(item.MeleeWeapon(name, weight, value, damage=damage, size=siz, criticalRange=criticalRange, criticalMultiplier=criticalMultiplier, range=range, type=types, typeJoin=config.JOIN_AND if useAllTypes else config.JOIN_OR, special=specials, specialJoin=config.JOIN_AND if useAllSpecials else config.JOIN_OR, isTwoHanded=twoHanded, isLight=light, isMartial=martial, isExotic=exotic, isMasterwork=masterwork, enchantment=enchantment, applicableSlots=applicableSlots, cancelSlots=cancelSlots), quantity)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            elif query == "/character/item/add/weapon/melee":
+                                char.Inventory.AddItem(item.MeleeWeapon(name, weight, value, damage=damage, size=siz, criticalRange=criticalRange, criticalMultiplier=criticalMultiplier, range=range, type=types, typeJoin=config.JOIN_AND if useAllTypes else config.JOIN_OR, special=specials, specialJoin=config.JOIN_AND if useAllSpecials else config.JOIN_OR, isTwoHanded=twoHanded, isLight=light, isMartial=martial, isExotic=exotic, isMasterwork=masterwork, enchantment=enchantment), quantity)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            elif query == "/character/item/add/weapon/ranged":
+                                if 'ammotype' not in params or len(params['ammotype']) < 1:
+                                    self.Failure("No ammotype provided")
+                                    return
+                                ammoType = config.AmmoTypeDict[params["ammotype"]]
+                                char.Inventory.AddItem(item.MeleeWeapon(name, weight, value, damage=damage, size=siz, criticalRange=criticalRange, criticalMultiplier=criticalMultiplier, range=range, type=types, typeJoin=config.JOIN_AND if useAllTypes else config.JOIN_OR, special=specials, specialJoin=config.JOIN_AND if useAllSpecials else config.JOIN_OR, isTwoHanded=twoHanded, isLight=light, isMartial=martial, isExotic=exotic, isMasterwork=masterwork, enchantment=enchantment, ammoType=ammoType), quantity)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            else:
+                                traceback.print_exc()
+                                self.Failure("Could not parse request")
+                        elif query.startswith('/character/item/add/wearable'):
+                            if query == "/character/item/add/wearable/armor":
+                                if 'weighttype' not in params or len(params['weighttype']) < 1:
+                                    self.Failure("No weighttype provided")
+                                    return
+                                if 'size' not in params or len(params['size']) < 1:
+                                    self.Failure("No size provided")
+                                    return
+                                if 'armorclass' not in params or len(params['armorclass']) < 1:
+                                    self.Failure("No armorclass provided")
+                                    return
+                                if 'armorcheckpenalty' not in params or len(params['armorcheckpenalty']) < 1:
+                                    self.Failure("No armorcheckpenalty provided")
+                                    return
+                                if 'maxdexbonus' not in params or len(params['maxdexbonus']) < 1:
+                                    self.Failure("No maxdexbonus provided")
+                                    return
+                                if 'enchantment' not in params or len(params['enchantment']) < 1:
+                                    self.Failure("No enchantment provided")
+                                    return
+                                weightType = config.NONE
+                                siz = size.Medium()
+                                armorClass = 0
+                                armorCheckPenalty = 0
+                                maxDexBonus = 0
+                                enchantment = 0
+                                masterwork = False
+                                try:
+                                    weightType = config.ArmorTypeDict[params['weighttype'][0]]
+                                    siz = size.sizeDict[config.SizeNameToId[params['size'][0]]]()
+                                    armorClass = int(params['armorclass'][0])
+                                    armorCheckPenalty = int(params['armorcheckpenalty'][0])
+                                    maxDexBonus = int(params['maxdexbonus'][0])
+                                    enchantment = int(params['enchantment'][0])
+                                    masterwork = params['masterwork'][0] == True
+                                    char.Inventory.AddItem(item.Armor(name, weight, value, weightType=weightType, armorClass=armorClass, maxDexBonus=maxDexBonus, armorCheckPenalty=armorCheckPenalty, spellFailureChance=spellFailureChance, size=siz, masterwork=masterwork, enchantment=enchantment), quantity)
+                                except Exception:
+                                    traceback.print_exc()
+                                    self.Failure("Could not parse request")
+                                    return
+                            elif query == "/character/item/add/wearable/shield":
+                                if 'weighttype' not in params or len(params['weighttype']) < 1:
+                                    self.Failure("No weighttype provided")
+                                    return
+                                if 'size' not in params or len(params['size']) < 1:
+                                    self.Failure("No size provided")
+                                    return
+                                if 'armorclass' not in params or len(params['armorclass']) < 1:
+                                    self.Failure("No armorclass provided")
+                                    return
+                                if 'armorcheckpenalty' not in params or len(params['armorcheckpenalty']) < 1:
+                                    self.Failure("No armorcheckpenalty provided")
+                                    return
+                                if 'maxdexbonus' not in params or len(params['maxdexbonus']) < 1:
+                                    self.Failure("No maxdexbonus provided")
+                                    return
+                                if 'enchantment' not in params or len(params['enchantment']) < 1:
+                                    self.Failure("No enchantment provided")
+                                    return
+                                weightType = config.NONE
+                                siz = size.Medium()
+                                armorClass = 0
+                                armorCheckPenalty = 0
+                                maxDexBonus = 0
+                                enchantment = 0
+                                masterwork = False
+                                try:
+                                    weightType = config.ArmorTypeDict[params['weighttype'][0]]
+                                    siz = size.sizeDict[config.SizeNameToId[params['size'][0]]]()
+                                    armorClass = int(params['armorclass'][0])
+                                    armorCheckPenalty = int(params['armorcheckpenalty'][0])
+                                    maxDexBonus = int(params['maxdexbonus'][0])
+                                    enchantment = int(params['enchantment'][0])
+                                    masterwork = params['masterwork'][0] == True
+                                    char.Inventory.AddItem(item.Shield(name, weight, value, weightType=weightType, armorClass=armorClass, maxDexBonus=maxDexBonus, armorCheckPenalty=armorCheckPenalty, spellFailureChance=spellFailureChance, size=siz, masterwork=masterwork, enchantment=enchantment), quantity)
+                                except Exception:
+                                    traceback.print_exc()
+                                    self.Failure("Could not parse request")
+                                    return
+                            elif query == "/character/item/add/wearable/magicalprotection":
+                                cancelSlots = []
+                                applicableSlots = []
+                                if 'applicableslots' in params:
+                                    applicableSlots = params['applicableslots']
+                                if 'cancelsslots' in params:
+                                    cancelSlots = params['cancelsslots']
+                                char.Inventory.AddItem(item.MagicalProtection(name, weight, value, damage=damage, size=siz, criticalRange=criticalRange, criticalMultiplier=criticalMultiplier, range=range, type=types, typeJoin=config.JOIN_AND if useAllTypes else config.JOIN_OR, special=specials, specialJoin=config.JOIN_AND if useAllSpecials else config.JOIN_OR, isTwoHanded=twoHanded, isLight=light, isMartial=martial, isExotic=exotic, isMasterwork=masterwork, enchantment=enchantment, applicableSlots=applicableSlots, cancelSlots=cancelSlots), quantity)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            elif query == "/character/item/add/wearable/other":
+                                cancelSlots = []
+                                applicableSlots = []
+                                if 'applicableslots' in params:
+                                    applicableSlots = params['applicableslots']
+                                if 'cancelsslots' in params:
+                                    cancelSlots = params['cancelsslots']
+                                char.Inventory.AddItem(item.WearableItem(name, weight, value, damage=damage, size=siz, criticalRange=criticalRange, criticalMultiplier=criticalMultiplier, range=range, type=types, typeJoin=config.JOIN_AND if useAllTypes else config.JOIN_OR, special=specials, specialJoin=config.JOIN_AND if useAllSpecials else config.JOIN_OR, isTwoHanded=twoHanded, isLight=light, isMartial=martial, isExotic=exotic, isMasterwork=masterwork, enchantment=enchantment, applicableSlots=applicableSlots, cancelSlots=cancelSlots), quantity)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            else:
+                                self.Failure("Could not parse request")
+                        elif query == "/character/item/add/ammunition":
+                            if 'ammotype' not in params or len(params['ammotype']) < 1:
+                                self.Failure("No ammotype provided")
+                                return
+                            try:
+                                ammoType = config.AmmoTypeDict[params["ammotype"]]
+                                extraDamage = 0
+                                extraRange = 0
+                                extraAttack = 0
+                                if 'extradamage' in params:
+                                    extraDamage = int(params["extradamage"][0])
+                                if 'extrarange' in params:
+                                    extraRange = int(params["extrarange"][0])
+                                if 'extraattack' in params:
+                                    extraAttack = int(params["extraattack"][0])
+                                char.Inventory.AddItem(item.RangedWeapon(name, weight, value, extraDamage=extraDamage, extraRange=extraRange, extraAttack=extraAttack, type=ammoType), quantity)
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
+                                return False
+                        else:
+                            self.Failure("Could not parse request")
                     elif query == "/character/item/remove":
-                        return
-                    elif query == "/character/item/changequantity":
-                        return
-                    elif query == "/character/item/changeweight":
-                        return
-                    elif query == "/character/item/changevalue":
-                        return
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'itemindex' not in params or len(params['itemindex']) < 1:
+                            self.Failure("No itemindex provided")
+                        else:
+                            try:
+                                char.RemoveItem(int(params['itemindex'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
+                    elif query == "/character/item/edit":
+                        char = GetCharacter(params['id'][0])
+                        if not char:
+                            self.Failure("Character not found")
+                        if 'itemindex' not in params or len(params['itemindex']) < 1:
+                            self.Failure("No itemindex provided")
+                        if 'name' not in params or len(params['name']) < 1:
+                            self.Failure("No name provided")
+                        if 'weight' not in params or len(params['weight']) < 1:
+                            self.Failure("No weight provided")
+                        if 'value' not in params or len(params['value']) < 1:
+                            self.Failure("No value provided")
+                        if 'quantity' not in params or len(params['quantity']) < 1:
+                            self.Failure("No quantity provided")
+                        else:
+                            try:
+                                char.EditItem(int(params['itemindex'][0]), params['name'][0], int(params['quantity'][0]), float(params['value'][0]), float(params['weight'][0]))
+                                SaveCharacter(char)
+                                self.Success('Success')
+                            except Exception:
+                                traceback.print_exc()
+                                self.Failure('Unable to parse')
+                                return False
                     else:
                         self.Failure("Could not parse request")
                 elif query.startswith("/character/spell"):
@@ -765,6 +1125,7 @@ class Handler(SimpleHTTPRequestHandler):
                             except Exception:
                                 traceback.print_exc()
                                 self.Failure('Unable to parse')
+                                return False
                     elif query == "/character/spell/learn":
                         char = GetCharacter(params['id'][0])
                         if not char:
@@ -784,6 +1145,7 @@ class Handler(SimpleHTTPRequestHandler):
                             except Exception:
                                 traceback.print_exc()
                                 self.Failure('Unable to parse')
+                                return False
                         return
                     elif query == "/character/spell/forget":
                         char = GetCharacter(params['id'][0])
@@ -995,11 +1357,32 @@ class Handler(SimpleHTTPRequestHandler):
 
     def ServeClasses(self):
         try:
-            classes = characterclass.GetClassNames()
+            classes = []
+            for key in config.ClassNameToId:
+                classes.append({
+                    'Name': key,
+                    'Id': config.ClassNameToId[key]
+                })
             self.send_response(200)
             self.send_header('Content-Type', GetContentType('.json'))
             self.end_headers()
             self.wfile.write(json.dumps(classes))
+        except Exception:
+            traceback.print_exc()
+            self.Failure("Could not get classes")
+
+    def ServeSkills(self):
+        try:
+            skills = []
+            for key in config.SkillNameToId:
+                skills.append({
+                    'Name': key,
+                    'Id': config.SkillNameToId[key]
+                })
+            self.send_response(200)
+            self.send_header('Content-Type', GetContentType('.json'))
+            self.end_headers()
+            self.wfile.write(json.dumps(skills))
         except Exception:
             traceback.print_exc()
             self.Failure("Could not get classes")
@@ -1087,6 +1470,29 @@ class Handler(SimpleHTTPRequestHandler):
             except Exception:
                 traceback.print_exc()
                 self.Failure("Could not get feats")
+
+    def ServeEquipableItems(self):
+        parsedParams = urlparse(self.path)
+        params = parse_qs(parsedParams.query)
+        if 'id' not in params or len(params['id']) < 1:
+            self.Failure("No id provided")
+        elif 'slot' not in params or len(params['slot']) < 1:
+            self.Failure("No slot provided")
+        else:
+            c = None
+            try:
+                c = GetCharacter(params['id'][0])
+                if not c:
+                    self.Failure("Character not found")
+                slot = int(params['slot'][0])
+                items = c.Inventory.GetEquipableItems(slot)
+                self.send_response(200)
+                self.send_header('Content-Type', GetContentType('.json'))
+                self.end_headers()
+                self.wfile.write(json.dumps(items))
+            except Exception:
+                traceback.print_exc()
+                self.Failure("Could not get equipable items")
 
 
 httpd = SocketServer.TCPServer(("", PORT), Handler)

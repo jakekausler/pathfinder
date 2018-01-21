@@ -193,6 +193,56 @@ angular.module('pathfinder', ['ngMaterial', 'ngSanitize'])
             }
         }
 
+        $scope.showFCSkillDialog = function($event) {
+            $mdDialog.show({
+                clickOutsideToClose: true,
+                targetEvent: $event,
+                locals: {
+                    parent: $scope
+                },
+                controller: FCSkillDialogController,
+                templateUrl: 'main/skills/applyfcpointsdialog.html'
+            });
+        }
+
+        function FCSkillDialogController($scope, $mdDialog, $mdToast, $http, parent) {
+            $scope.parent = parent;
+            $scope.skill = -1;
+            $scope.amount = 0;
+            $scope.skills = null;
+            $scope.loadSkills = function() {
+                return $http({
+                    url: 'skills',
+                    method: 'GET'
+                }).then(function(response) {
+                    $scope.skills = response.data;
+                });
+            };
+            $scope.cancel = function() {
+                $mdDialog.hide();
+            };
+            $scope.hide = function() {
+                $mdDialog.hide();
+            };
+            $scope.save = function() {
+                $http({
+                    url: 'character/skill/applyfcpoints',
+                    method: 'POST',
+                    params: {
+                        id: $scope.parent.character.Id,
+                        skillid: $scope.skill,
+                        value: $scope.amount
+                    }
+                }).then(function(response) {
+                    $mdToast.showSimple("Success: " + response.data);
+                    $scope.parent.updateCharacter();
+                    $scope.hide();
+                }, function(response) {
+                    $mdToast.showSimple("Failed: " + response.data);
+                });
+            }
+        }
+
         $scope.showDamageDialog = function($event) {
             $mdDialog.show({
                 clickOutsideToClose: true,
@@ -313,162 +363,6 @@ angular.module('pathfinder', ['ngMaterial', 'ngSanitize'])
             };
         }
 
-        $scope.showWeaponDialog = function($event) {
-            // TODO
-            $mdDialog.show({
-                clickOutsideToClose: true,
-                targetEvent: $event,
-                locals: {
-                    parent: $scope
-                },
-                controller: WeaponController,
-                templateUrl: 'main/items/weapons/weapondialog.html'
-            });
-        }
-
-        function WeaponController($scope, $mdDialog, $mdToast, $http, parent) {
-            // TODO
-            $scope.parent = parent;
-            $scope.cancel = function() {
-                $mdDialog.hide();
-            };
-            $scope.hide = function() {
-                $mdDialog.hide();
-            };
-            $scope.save = function(type) {
-                $http({
-                    url: 'character/' + type,
-                    method: 'POST',
-                    params: {
-                        id: $scope.parent.character.Id
-                    }
-                }).then(function(response) {
-                    $mdToast.showSimple("Success: " + response.data);
-                    parent.updateCharacter();
-                    $scope.hide();
-                }, function(response) {
-                    $mdToast.showSimple("Failed: " + response.data);
-                });
-            };
-        }
-
-        $scope.showArmorDialog = function($event) {
-            // TODO
-            $mdDialog.show({
-                clickOutsideToClose: true,
-                targetEvent: $event,
-                locals: {
-                    parent: $scope
-                },
-                controller: ArmorController,
-                templateUrl: 'main/items/armor/armordialog.html'
-            });
-        }
-
-        function ArmorController($scope, $mdDialog, $mdToast, $http, parent) {
-            // TODO
-            $scope.parent = parent;
-            $scope.cancel = function() {
-                $mdDialog.hide();
-            };
-            $scope.hide = function() {
-                $mdDialog.hide();
-            };
-            $scope.save = function(type) {
-                $http({
-                    url: 'character/' + type,
-                    method: 'POST',
-                    params: {
-                        id: $scope.parent.character.Id
-                    }
-                }).then(function(response) {
-                    $mdToast.showSimple("Success: " + response.data);
-                    parent.updateCharacter();
-                    $scope.hide();
-                }, function(response) {
-                    $mdToast.showSimple("Failed: " + response.data);
-                });
-            };
-        }
-
-        $scope.showShieldDialog = function($event) {
-            // TODO
-            $mdDialog.show({
-                clickOutsideToClose: true,
-                targetEvent: $event,
-                locals: {
-                    parent: $scope
-                },
-                controller: ShieldController,
-                templateUrl: 'main/items/armor/shielddialong.html'
-            });
-        }
-
-        function ShieldController($scope, $mdDialog, $mdToast, $http, parent) {
-            // TODO
-            $scope.parent = parent;
-            $scope.cancel = function() {
-                $mdDialog.hide();
-            };
-            $scope.hide = function() {
-                $mdDialog.hide();
-            };
-            $scope.save = function(type) {
-                $http({
-                    url: 'character/' + type,
-                    method: 'POST',
-                    params: {
-                        id: $scope.parent.character.Id
-                    }
-                }).then(function(response) {
-                    $mdToast.showSimple("Success: " + response.data);
-                    parent.updateCharacter();
-                    $scope.hide();
-                }, function(response) {
-                    $mdToast.showSimple("Failed: " + response.data);
-                });
-            };
-        }
-
-        $scope.showMagicalProtectiveDialog = function($event) {
-            // TODO
-            $mdDialog.show({
-                clickOutsideToClose: true,
-                targetEvent: $event,
-                locals: {
-                    parent: $scope
-                },
-                controller: MagicalProtectiveController,
-                templateUrl: 'main/items/magical/magicaldialog.html'
-            });
-        }
-
-        function MagicalProtectiveController($scope, $mdDialog, $mdToast, $http, parent) {
-            // TODO
-            $scope.parent = parent;
-            $scope.cancel = function() {
-                $mdDialog.hide();
-            };
-            $scope.hide = function() {
-                $mdDialog.hide();
-            };
-            $scope.save = function(type) {
-                $http({
-                    url: 'character/' + type,
-                    method: 'POST',
-                    params: {
-                        id: $scope.parent.character.Id
-                    }
-                }).then(function(response) {
-                    $mdToast.showSimple("Success: " + response.data);
-                    parent.updateCharacter();
-                    $scope.hide();
-                }, function(response) {
-                    $mdToast.showSimple("Failed: " + response.data);
-                });
-            };
-        }
-
         $scope.showFeatDialog = function($event, idx) {
             $mdDialog.show({
                 clickOutsideToClose: true,
@@ -553,6 +447,57 @@ angular.module('pathfinder', ['ngMaterial', 'ngSanitize'])
                     params: {
                         id: $scope.parent.character.Id,
                         value: $scope.selectedItem.ID
+                    }
+                }).then(function(response) {
+                    $mdToast.showSimple("Success: " + response.data);
+                    parent.updateCharacter();
+                    $scope.hide();
+                }, function(response) {
+                    $mdToast.showSimple("Failed: " + response.data);
+                });
+            };
+        }
+
+        $scope.showAddClassDialog = function($event) {
+            $mdDialog.show({
+                clickOutsideToClose: true,
+                targetEvent: $event,
+                locals: {
+                    parent: $scope
+                },
+                controller: AddClassController,
+                templateUrl: 'main/classes/newclassdialog.html'
+            });
+        }
+
+        function AddClassController($scope, $mdDialog, $mdToast, $http, parent) {
+            $scope.parent = parent;
+            $scope.classId = -1;
+            $scope.classes;
+            $scope.loadClasses = function() {
+                return $http({
+                    url: 'classes',
+                    method: 'GET',
+                    params: {
+                        id: $scope.parent.character.Id
+                    }
+                }).then(function(response) {
+                    $scope.classes = response.data;
+                });
+            };
+            $scope.cancel = function() {
+                $mdDialog.hide();
+            };
+            $scope.hide = function() {
+                $mdDialog.hide();
+            };
+            $scope.save = function() {
+                $http({
+                    url: 'character/class/add',
+                    method: 'POST',
+                    params: {
+                        id: $scope.parent.character.Id,
+                        classidx: $scope.classId
                     }
                 }).then(function(response) {
                     $mdToast.showSimple("Success: " + response.data);
@@ -726,22 +671,223 @@ angular.module('pathfinder', ['ngMaterial', 'ngSanitize'])
             };
         }
 
-        $scope.showItemsDialog = function($event) {
-            // TODO
+        $scope.showItemsDialog = function($event, item, idx) {
             $mdDialog.show({
                 clickOutsideToClose: true,
                 targetEvent: $event,
                 locals: {
-                    parent: $scope
+                    parent: $scope,
+                    item: item,
+                    idx: idx
                 },
                 controller: ItemsController,
                 templateUrl: 'inventory/items/itemdialog.html'
             });
         }
 
-        function ItemsController($scope, $mdDialog, $mdToast, $http, parent) {
-            // TODO
+        function ItemsController($scope, $mdDialog, $mdToast, $http, parent, item, idx) {
             $scope.parent = parent;
+            $scope.name = item.Item.Name;
+            $scope.quantity = item.Quantity;
+            $scope.value = item.Item.Value;
+            $scope.weight = item.Item.Weight;
+            $scope.cancel = function() {
+                $mdDialog.hide();
+            };
+            $scope.hide = function() {
+                $mdDialog.hide();
+            };
+            $scope.save = function() {
+                $http({
+                    url: 'character/item/edit',
+                    method: 'POST',
+                    params: {
+                        id: $scope.parent.character.Id,
+                        itemindex: idx,
+                        name: $scope.name,
+                        quantity: $scope.quantity,
+                        value: $scope.value,
+                        weight: $scope.weight
+                    }
+                }).then(function(response) {
+                    $mdToast.showSimple("Success: " + response.data);
+                    parent.updateCharacter();
+                    $scope.hide();
+                }, function(response) {
+                    $mdToast.showSimple("Failed: " + response.data);
+                });
+            };
+            $scope.remove = function() {
+                $http({
+                    url: 'character/item/remove',
+                    method: 'POST',
+                    params: {
+                        id: $scope.parent.character.Id,
+                        itemindex: idx
+                    }
+                }).then(function(response) {
+                    $mdToast.showSimple("Success: " + response.data);
+                    parent.updateCharacter();
+                    $scope.hide();
+                }, function(response) {
+                    $mdToast.showSimple("Failed: " + response.data);
+                });
+            };
+        }
+
+        $scope.showNewItemDialog = function($event) {
+            $mdDialog.show({
+                clickOutsideToClose: true,
+                targetEvent: $event,
+                locals: {
+                    parent: $scope
+                },
+                controller: NewItemController,
+                templateUrl: 'inventory/items/newitemdialog.html'
+            });
+        }
+
+        function NewItemController($scope, $mdDialog, $mdToast, $http, parent) {
+            $scope.parent = parent;
+
+            $scope.itemType = "";
+            $scope.name = ""
+            $scope.quantity = 0
+            $scope.value = 0;
+            $scope.weight = 0;
+
+            $scope.weaponType = "";
+            $scope.damage = "";
+            $scope.critical = "";
+            $scope.range = 0;
+            $scope.weaponAttackTypes = [];
+            $scope.usesAllTypes = false;
+            $scope.weaponSpecials = [];
+            $scope.usesAllSpecials = false;
+            $scope.twoHanded = false;
+            $scope.light = false;
+            $scope.martial = false;
+            $scope.exotic = false;
+            $scope.masterwork = false;
+            $scope.enchantment = 0;
+            $scope.size = "";
+
+            $scope.wearableType = "";
+            $scope.applicableSlots = [];
+            $scope.cancelsSlots = [];
+            $scope.weightType = "";
+            $scope.armorClass = 0;
+            $scope.armorCheckPenalty = 0;
+            $scope.maxDexBonus = 0;
+
+            $scope.ammoType = "";
+            $scope.extraDamage = "";
+            $scope.extraRange = 0;
+            $scope.extraAttack = 0;
+
+            $scope.cancel = function() {
+                $mdDialog.hide();
+            };
+            $scope.hide = function() {
+                $mdDialog.hide();
+            };
+            $scope.save = function() {
+                url = 'character/item/add/' + $scope.itemType.toLowerCase();
+                if ($scope.itemType == 'Weapon') {
+                    url += '/' + $scope.weaponType.toLowerCase();
+                } else if ($scope.itemType == 'Wearable') {
+                    url += '/' + $scope.wearableType.toLowerCase().replace(' ', '');
+                }
+                $http({
+                    url: url,
+                    method: 'POST',
+                    params: {
+                        id: $scope.parent.character.Id,
+                        itemType: $scope.itemType,
+                        name: $scope.name,
+                        quantity: $scope.quantity,
+                        value: $scope.value,
+                        weight: $scope.weight,
+                        weapontype: $scope.weaponType,
+                        damage: $scope.damage,
+                        critical: $scope.critical,
+                        range: $scope.range,
+                        weaponattacktypes: $scope.weaponAttackTypes,
+                        usesalltypes: $scope.usesAllTypes,
+                        weaponSpecials: $scope.weaponSpecials,
+                        usesallspecials: $scope.usesAllSpecials,
+                        twohanded: $scope.twoHanded,
+                        light: $scope.light,
+                        martial: $scope.martial,
+                        exotic: $scope.exotic,
+                        masterwork: $scope.masterwork,
+                        enchantment: $scope.enchantment,
+                        size: $scope.size,
+                        wearabletype: $scope.wearableType,
+                        weighttype: $scope.weightType,
+                        applicableslots: $scope.applicableSlots,
+                        cancelsslots: $scope.cancelsSlots,
+                        ammotype: $scope.ammoType,
+                        extradamage: $scope.extraDamage,
+                        extrarange: $scope.extraRange,
+                        extraattack: $scope.extraAttack
+                    }
+                }).then(function(response) {
+                    $mdToast.showSimple("Success: " + response.data);
+                    parent.updateCharacter();
+                    $scope.hide();
+                }, function(response) {
+                    $mdToast.showSimple("Failed: " + response.data);
+                });
+            };
+            $scope.itemTypes = ['Item', 'Weapon', 'Wearable', 'Ammunition']
+
+            $scope.weaponTypes = ['Unarmed', 'Melee', 'Ranged']
+            $scope.attackTypes = ["Bludgeoning", "Slashing", "Peircing"]
+            $scope.specials = ["Blocking", "Brace", "Deadly", "Disarm", "Distracting", "Double", "Fragile", "Grapple", "Monk", "Nonlethal", "Performance", "Reach", "Strength", "Sunder", "Trip"]
+            $scope.sizes = ["Fine", "Diminutive", "Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan", "Colossal"];
+
+            $scope.wearableTypes = ['Shield', 'Armor', 'Magical Protection', 'Other']
+            $scope.weightTypes = ["Light", "Medium", "Heavy"];
+
+            $scope.ammoTypes = ['Arrow', 'Dart', 'Bolt', 'Sling Bullet', 'Shuriken']
+        }
+
+        $scope.unequip = function($event, item) {
+            $http({
+                    url: 'character/equipment/unequip',
+                    method: 'POST',
+                    params: {
+                        id: $scope.character.Id,
+                        slot: item.EquippedAtSlot[0]
+                    }
+                }).then(function(response) {
+                    $mdToast.showSimple("Success: " + response.data);
+                    $scope.updateCharacter();
+                }, function(response) {
+                    $mdToast.showSimple("Failed: " + response.data);
+                });
+        }
+
+        $scope.showEquipDialog = function($event, item, itemIdx) {
+            $mdDialog.show({
+                clickOutsideToClose: true,
+                targetEvent: $event,
+                locals: {
+                    parent: $scope,
+                    item: item,
+                    itemIdx: itemIdx
+                },
+                controller: EquipController,
+                templateUrl: 'inventory/items/equipdialog.html'
+            });
+        }
+
+        function EquipController($scope, $mdDialog, $mdToast, $http, parent, item, itemIdx) {
+            $scope.parent = parent;
+            $scope.item = item;
+            $scope.itemIdx = itemIdx;
+            $scope.slot = 0;
             $scope.cancel = function() {
                 $mdDialog.hide();
             };
@@ -750,10 +896,12 @@ angular.module('pathfinder', ['ngMaterial', 'ngSanitize'])
             };
             $scope.save = function(type) {
                 $http({
-                    url: 'character/' + type,
+                    url: 'character/equipment/equip',
                     method: 'POST',
                     params: {
-                        id: $scope.parent.character.Id
+                        id: $scope.parent.character.Id,
+                        itemid: $scope.itemIdx,
+                        slot: $scope.slot
                     }
                 }).then(function(response) {
                     $mdToast.showSimple("Success: " + response.data);
@@ -761,6 +909,61 @@ angular.module('pathfinder', ['ngMaterial', 'ngSanitize'])
                     $scope.hide();
                 }, function(response) {
                     $mdToast.showSimple("Failed: " + response.data);
+                });
+            };
+        }
+
+        $scope.showEquipmentEquipDialog = function($event, slot) {
+            $mdDialog.show({
+                clickOutsideToClose: true,
+                targetEvent: $event,
+                locals: {
+                    parent: $scope,
+                    slot: slot
+                },
+                controller: EquipmentEquipController,
+                templateUrl: 'inventory/equipment/equipmentdialog.html'
+            });
+        }
+
+        function EquipmentEquipController($scope, $mdDialog, $mdToast, $http, parent, slot) {
+            $scope.parent = parent;
+            $scope.slot = slot;
+            $scope.itemid = -1;
+            $scope.items = [];
+            $scope.cancel = function() {
+                $mdDialog.hide();
+            };
+            $scope.hide = function() {
+                $mdDialog.hide();
+            };
+            $scope.save = function(type) {
+                $http({
+                    url: 'character/equipment/equip',
+                    method: 'POST',
+                    params: {
+                        id: $scope.parent.character.Id,
+                        itemid: $scope.itemid,
+                        slot: $scope.slot
+                    }
+                }).then(function(response) {
+                    $mdToast.showSimple("Success: " + response.data);
+                    parent.updateCharacter();
+                    $scope.hide();
+                }, function(response) {
+                    $mdToast.showSimple("Failed: " + response.data);
+                });
+            };
+            $scope.loadEquipableItems = function() {
+                return $http({
+                    url: 'equipableitems',
+                    method: 'GET',
+                    params: {
+                        id: $scope.parent.character.Id,
+                        slot: $scope.slot
+                    }
+                }).then(function(response) {
+                    $scope.items = response.data;
                 });
             };
         }
@@ -1249,4 +1452,38 @@ angular.module('pathfinder', ['ngMaterial', 'ngSanitize'])
             });
         }
         $scope.updateColors();
+    })
+    .directive('dice', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elm, attrs, ctrl) {
+                ctrl.$validators.integer = function(modelValue, viewValue) {
+                    if (ctrl.$isEmpty(modelValue)) {
+                        return true;
+                    }
+                    expression = /^[0-9]+d[0-9]+( ?\+ ?[0-9]+)?$/
+                    if (expression.test(viewValue)) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        };
+    })
+    .directive('crit', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elm, attrs, ctrl) {
+                ctrl.$validators.integer = function(modelValue, viewValue) {
+                    if (ctrl.$isEmpty(modelValue)) {
+                        return true;
+                    }
+                    expression = /^([0-9]+(-[0-9]+)?\/)?x[0-9]+?$/
+                    if (expression.test(viewValue)) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        };
     });

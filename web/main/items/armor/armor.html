@@ -2,9 +2,6 @@
 	<thead>
 		<tr>
 			<th style='text-align: center'>
-				<span>Active</span>
-			</th>
-			<th style='text-align: center'>
 				<span>Name</span>
 			</th>
 			<th style='text-align: center'>
@@ -25,12 +22,9 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-click="showShieldDialog()">
-			<td style='text-align: center'>
-				<span>{{character.Armor.Armor == undefined ? "&nbsp;" : character.Armor.Active}}</span>
-			</td>
+		<tr ng-repeat="w in character.Armor"">
 			<td>
-				<span>{{character.Armor.Armor == undefined ? "&nbsp;" : character.Armor.Name}}</span>
+				<span>{{character.Armor.Name}}</span>
 			</td>
 			<td style='text-align: center'>
 				<span>{{character.Armor.Armor.AC}}</span>
@@ -48,12 +42,9 @@
 				<span>{{character.Armor.Armor.Weight}}</span>
 			</td>
 		</tr>
-		<tr ng-click="showArmorDialog()">
-			<td style='text-align: center'>
-				<span>{{character.Shield.Shield == undefined ? "&nbsp;" : character.Shield.Active}}</span>
-			</td>
+		<tr ng-repeat="w in character.Shield"">
 			<td>
-				<span>{{character.Shield.Shield == undefined ? "&nbsp;" : character.Shield.Shield.Name}}</span>
+				<span>{{character.Shield.Shield.Name}}</span>
 			</td>
 			<td style='text-align: center'>
 				<span>{{character.Shield.Shield.AC}}</span>

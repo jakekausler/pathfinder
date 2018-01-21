@@ -5,7 +5,6 @@ import gender
 import color
 import ability
 import growth
-import magicalprotection
 import encumberance
 import skill
 import item
@@ -152,13 +151,6 @@ class Character:
 
         self.HeroPoints = 0
         self.MaxHeroPoints = 0
-
-        self.Weapons = []  # List of (Weapon, active)
-
-        self.Armor = (None, False)  # Armor, active
-        self.Shield = (None, False)  # Shield, active
-
-        self.MagicalProtection = []  # List of (MagicalProtection, active)
 
         self.FlightManeuverability = config.MOVETYPE_AVERAGE
         self.MovementIgnoreArmor = config.MOVETYPE_NO_EFFECT
@@ -373,8 +365,8 @@ class Character:
 
     def ArmorClass(self):
         return (10 +
-                (self.Armor[0].ArmorClass() if self.Armor[1] else 0) +
-                (self.Shield[0].ArmorClass() if self.Shield[1] else 0) +
+                (sum([a.GetArmorClass() for a in self.Inventory.GetEquippedArmor()])) +
+                (sum([a.GetArmorClass() for a in self.Inventory.GetEquippedShield()])) +
                 min(self.AbilityModifiers()[config.ABILITY_DEXTERITY], self.MaxDexBonus()) +
                 self.Size().ArmorClass +
                 self.CalculateEffects(self.EffectNaturalArmorClass) +
@@ -384,8 +376,8 @@ class Character:
 
     def FlatFooted(self):
         return (10 +
-                (self.Armor[0].ArmorClass() if self.Armor[1] else 0) +
-                (self.Shield[0].ArmorClass() if self.Shield[1] else 0) +
+                (sum([a.GetArmorClass() for a in self.Inventory.GetEquippedArmor()])) +
+                (sum([a.GetArmorClass() for a in self.Inventory.GetEquippedShield()])) +
                 (-1 if min(self.AbilityModifiers()[config.ABILITY_DEXTERITY], self.MaxDexBonus()) < 0 else 0) +
                 self.Size().ArmorClass +
                 self.CalculateEffects(self.EffectNaturalArmorClass) +
@@ -410,18 +402,24 @@ class Character:
                 self.GetEffectScoreByType(self.EffectArmorClass, config.EFFECT_DODGE) +
                 self.MiscArmorClass + self.TempArmorClass)
 
+    def MinMaxDexBonus(self, items):
+        if not items or len(items) == 0:
+            return 99999
+        else:
+            return min([i.MaxDexBonus for i in items])
+
     def MaxDexBonus(self):
         enc = encumberance.GetEncumberance(self)
-        return min((self.Armor[0].MaxDexBonus if self.Armor[1] else 99999),
-                   (self.Shield[0].MaxDexBonus if self.Shield[1] else 99999),
+        return min((self.MinMaxDexBonus(self.Inventory.GetEquippedArmor())),
+                   (self.MinMaxDexBonus(self.Inventory.GetEquippedShield())),
                    (99999 if enc == config.ENCUMBERANCE_LIGHT else
                     (3 if enc == config.ENCUMBERANCE_MEDIUM else
                         (1 if enc == config.ENCUMBERANCE_HEAVY else
                             (0 if enc == config.ENCUMBERANCE_OVER else 99999)))))
 
     def ArcaneSpellFailure(self):
-        return ((self.Armor[0].SpellFailure if self.Armor[1] else 0) +
-                (self.Shield[0].SpellFailure if self.Shield[1] else 0))
+        return ((sum(i.SpellFailure for i in self.Inventory.GetEquippedArmor())) +
+                (sum(i.SpellFailure for i in self.Inventory.GetEquippedShield())))
 
     def Initiative(self):
         return min(self.AbilityModifiers()[config.ABILITY_DEXTERITY], self.MaxDexBonus()) + self.MiscInitiative;
@@ -451,8 +449,8 @@ class Character:
 
     def ArmorCheckPenalty(self):
         enc = encumberance.GetEncumberance(self)
-        return ((self.Armor[0].ArmorCheckPenalty if self.Armor[1] else 0) +
-                (self.Shield[0].ArmorCheckPenalty if self.Shield[1] else 0) +
+        return ((sum([a.GetArmorCheckPenalty() for a in self.Inventory.GetEquippedArmor()])) +
+                (sum([a.GetArmorCheckPenalty() for a in self.Inventory.GetEquippedShield()])) +
                 (0 if enc == config.ENCUMBERANCE_LIGHT else
                     (-3 if enc == config.ENCUMBERANCE_MEDIUM else
                         (-6 if enc == config.ENCUMBERANCE_HEAVY else
@@ -494,6 +492,12 @@ class Character:
                 self.Size().CMB +
                 self.MiscCMB + self.TempCMB)
 
+    def MaxWeightType(self, items):
+        if not items or len(items) == 0:
+            return config.NONE
+        else:
+            return max([i.WeightType for i in items])
+
     # A dict of speed type: [single, charge, run]
     def Speeds(self):
         speeds = {}
@@ -518,7 +522,7 @@ class Character:
                 baseSpeedClimb = self.Race.Speed * (1 if self.CalculateEffects(self.EffectSpeedMultiplierClimb)==0 else self.CalculateEffects(self.EffectSpeedMultiplierClimb))
             else:
                 if ((self.MovementIgnoreArmor == config.MOVETYPE_ARMOR_TRAINING_I) and
-                    ((self.Armor[1] and self.Armor[0].Weight == config.ARMOR_HEAVY) or
+                    ((self.MaxWeightType(self.Inventory.GetEquippedArmor()) == config.ARMOR_HEAVY) or
                      enc == config.ENCUMBERANCE_MEDIUM or enc == config.ENCUMBERANCE_HEAVY)):
                         baseSpeedLand = math.ceil(self.Race.Speed*float(2)/3/5)*5*(1 if self.CalculateEffects(self.EffectSpeedMultiplierLand)==0 else self.CalculateEffects(self.EffectSpeedMultiplierLand))
                         baseSpeedFly = math.ceil(self.Race.Speed*float(2)/3/5)*5*(1 if self.CalculateEffects(self.EffectSpeedMultiplierFly)==0 else self.CalculateEffects(self.EffectSpeedMultiplierFly))
@@ -535,8 +539,8 @@ class Character:
                             baseSpeedClimb = math.ceil(self.Race.Speed*float(2)/3/5)*5*(1 if self.CalculateEffects(self.EffectSpeedMultiplierClimb)==0 else self.CalculateEffects(self.EffectSpeedMultiplierClimb))
                     else:
                         if (self.MovementIgnoreArmor == config.MOVETYPE_NO_EFFECT and
-                            ((self.Armor[1] and self.Armor[0].Weight == config.ARMOR_HEAVY) or
-                             (self.Armor[1] and self.Armor[0].Weight == config.ARMOR_MEDIUM) or
+                            ((self.MaxWeightType(self.Inventory.GetEquippedArmor()) == config.ARMOR_HEAVY) or
+                             (self.MaxWeightType(self.Inventory.GetEquippedArmor()) == config.ARMOR_MEDIUM) or
                              enc == config.ENCUMBERANCE_MEDIUM or enc == config.ENCUMBERANCE_HEAVY)):
                                 baseSpeedLand = math.ceil(self.Race.Speed*float(2)/3/5)*5*(1 if self.CalculateEffects(self.EffectSpeedMultiplierLand)==0 else self.CalculateEffects(self.EffectSpeedMultiplierLand))
                                 baseSpeedFly = math.ceil(self.Race.Speed*float(2)/3/5)*5*(1 if self.CalculateEffects(self.EffectSpeedMultiplierFly)==0 else self.CalculateEffects(self.EffectSpeedMultiplierFly))
@@ -566,13 +570,14 @@ class Character:
                                  (int)((baseSpeedClimb + self.BaseChargeRunBoost) * (self.RunMultiplier if self.RunMultiplier != 1 else (3 if enc >= config.ENCUMBERANCE_HEAVY else 4)))]
         return speeds
 
-    def GetWeaponDamage(self, index):
-        if ():
-            return self.Weapons[index].GetDamage(self)
+    def GetWeaponDamage(self, slot):
+            if slot in self.Inventory.Worn.Items and self.Inventory.Worn.Items[slot] and isinstance(self.Inventory.Worn.Items[slot], item.Weapon):
+                return self.Inventory.Worn.Items[slot].GetDamage(self)
+            else:
+                return 0
 
-    def GetWeaponAttack(self, index):
-        if ():
-            return self.Weapons[index].GetDamage(self)
+    def GetWeaponAttack(self, slot):
+        return self.MeleeAttack
 
     def IsClassSkill(self, key):
         return any(c[0].ClassSkill(key) for c in self.Classes)
@@ -620,6 +625,12 @@ class Character:
 
     def IncreaseExperience(self, amount):
         self.Experience += amount
+
+    def DecreaseClassLevel(self, idx, amount):
+        self.Classes[idx][1] -= amount
+
+    def IncreaseClassLevel(self, idx, amount):
+        self.Classes[idx][1] += amount
 
     def LearnSpell(self, classIdx, sp):
         if isinstance(self.Classes[classIdx][0], characterclass.SpellcastingClass):
@@ -723,6 +734,21 @@ class Character:
     def ForgetFeat(self, l):
         if l >= 0 or l < len(self.LearnedFeats):
             del self.LearnedFeats[l]
+
+    def EditItem(self, idx, name, quantity, value, weight):
+        self.Inventory.Items[idx][1] = quantity
+        self.Inventory.Items[idx][0].Name = name
+        self.Inventory.Items[idx][0].Value = value
+        self.Inventory.Items[idx][0].Weight = weight
+
+    def RemoveItem(self, idx):
+        self.Inventory.RemoveItem(idx)
+
+    def RemoveClass(self, idx):
+        del self.Classes[idx]
+
+    def AddClass(self, idx):
+        self.Classes.append([characterclass.ClassDict[idx](self, len(self.Classes)), 1])
 
     def CreateRandom(self):
         self.companions = []
@@ -847,13 +873,6 @@ class Character:
         self.HeroPoints = 0
         self.MaxHeroPoints = 0
 
-        self.Weapons = []  # List of (Weapon, active)
-
-        self.Armor = (None, False)  # Armor, active
-        self.Shield = (None, False)  # Shield, active
-
-        self.MagicalProtection = []  # List of (MagicalProtection, active)
-
         self.FlightManeuverability = config.MOVETYPE_AVERAGE
         self.MovementIgnoreArmor = config.MOVETYPE_NO_EFFECT
         self.RunMultiplier = 1
@@ -871,26 +890,18 @@ class Character:
 
         self.ChooseInitialLanguagesBasedOnIntelligence()
 
-    def CreateCustom(self, name, player, homeland=None, growth=None, armor=None, shield=None, magicalProtection=None, languages=None, skills=None, inventory=None, weapons=None, height=None, weight=None, hairColor=None, eyeColor=None, alignment=None, gender=None, age=None, diety=None, experience=0, abilities=None, race=None, classes=None, hitDieMethod=config.HIT_DIE_RANDOM):
+    def CreateCustom(self, name, player, homeland=None, growth=None, languages=None, skills=None, inventory=None, height=None, weight=None, hairColor=None, eyeColor=None, alignment=None, gender=None, age=None, diety=None, experience=0, abilities=None, race=None, classes=None, hitDieMethod=config.HIT_DIE_RANDOM):
         # self.CreateRandom()
         self.Name = name
         self.PlayerName = player
         if homeland:
             self.Homeland = homeland
-        if armor:
-            self.Armor = armor
-        if shield:
-            self.Sheild = shield
-        if magicalProtection:
-            self.MagicalProtection = magicalprotection
         if languages:
             self.Languages = languages
         if skills:
             self.Skills = skills
         if inventory:
             self.Inventory = inventory
-        if weapons:
-            self.Weapons = weapons
         if height:
             self.Height = height
         if weight:
@@ -983,21 +994,18 @@ class Character:
         ret += "\n"
         ret += "Weapons\n"
         ret += "\t{0:^20}{1:^10}{2:^10}{3:^6}{4:^6}{5:^6}\n".format("Name", "Attacks", "Damage", "Crit", "Range", "Type")
-        for w in range(len(self.Weapons)):
-            weap, active = self.Weapons[w]
-            if active:
-                ret += "\t{0:<20}{1:>10}{2:>10}{3:>6}{4:>6}{5:>6}\n".format(weap.name + ":", self.GetWeaponAttack(w), self.GetWeaponDamage(w), weap.Crit, weap.Range, weap.Type)
+        for w in range(len(self.Inventory.GetEquippedWeapons())):
+            ret += str(w)
         ret += "\n"
         ret += "Armor and Shield\n"
-        if self.Armor[1]:
-            ret += "\t{}".format(self.Armor[0].Name)
-        if self.Shield[1]:
-            ret += "\t{}".format(self.Shield[0].Name)
+        for w in range(len(self.Inventory.GetEquippedArmor())):
+            ret += str(w)
+        for w in range(len(self.Inventory.GetEquippedShield())):
+            ret += str(w)
         ret += "\n"
         ret += "Magical Protection\n"
-        for p in self.MagicalProtection:
-            if p[1]:
-                ret += "\t{}".format(p[0].name)
+        for w in range(len(self.Inventory.GetEquippedMagicalProtectives())):
+            ret += str(w)
         ret += "\n"
         ret += "Skills\n"
         for key in skill.GetSkillNames():
@@ -1083,10 +1091,20 @@ class Character:
         j['MeleeAttack'] = self.MeleeAttack()
         j['RangedAttack'] = self.RangedAttack()
         j['CMB'] = self.CMB()
-        j['Weapons'] = [{'Weapon': w[0].ToJson(), 'Active': w[1]} for w in self.Weapons]
-        j['Armor'] = {'Armor': self.Armor[0], 'Active': self.Armor[1]}
-        j['Shield'] = {'Shield': self.Shield[0], 'Active': self.Shield[1]}
-        j['MagicalProtection'] = [{'MagicalProtection': p[0], 'Active': p[1]} for p in self.MagicalProtection]
+        weapons = self.Inventory.GetEquippedWeapons()
+        j['Weapons'] = []
+        for i in range(len(weapons)):
+            j['Weapons'].append(weapons[i].ToJson())
+            j['Weapons'][i]['Attacks'] = weapons[i].GetAttack(self)
+            j['Weapons'][i]['Damage'] = weapons[i].GetAttackDamage(self).ToJson()
+            if weapons[i].CanThrow:
+                j['Weapons'][i]['CanThrow'] = True
+                j['Weapons'][i]['ThrowAttacks'] = weapons[i].GetAttackThrow(self)
+                j['Weapons'][i]['ThrowDamage'] = weapons[i].GetAttackDamageThrow(self).ToJson()
+                j['Weapons'][i]['ThrowCritical'] = weapons[i].GetCriticalThrow()
+        j['Armor'] = [w.ToJson() for w in self.Inventory.GetEquippedArmor()]
+        j['Shield'] = [w.ToJson() for w in self.Inventory.GetEquippedShield()]
+        j['MagicalProtection'] = [w.ToJson() for w in self.Inventory.GetEquippedMagicalProtectives()]
         j['Skills'] = [{'SkillId': key, 'Skill': skill.GetSkillName(key), 'Description': skill.SkillClasses[key](key).GetWebInfo(), 'Ranks': self.Skills[key][0], 'Score': self.SkillScores()[key], 'Available': self.SkillIsAvailable()[key]} for key in skill.GetSkillNames()]
         j['SkillPointsLeft'] = self.SkillPointsLeft()
         j['TotalSkillPoints'] = self.TotalSkillPoints()
@@ -1136,5 +1154,6 @@ class Character:
         j['NextLevelExperience'] = growth.GetStartingExperienceForLevel(self.GrowthRate, self.Level()+1)
         j['Encumberance'] = encumberance.GetEncumberanceString(encumberance.GetEncumberance(self))
         j['Inventory'] = self.Inventory.ToJson()
+        j['FavoredClassPointsLeft'] = self.FavoredClassPointsLeft()
         j['Companions'] = [c.ToJson() for c in self.companions]
         return j

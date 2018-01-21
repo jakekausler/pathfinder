@@ -2,11 +2,7 @@
 import config
 import character
 import alignment
-import color
 import race
-import growth
-import gender
-import ability
 import skill
 import characterclass
 import item
@@ -14,6 +10,8 @@ import spell
 import feat
 import format_spells
 import format_feats
+import roll
+import size
 
 import pickle
 
@@ -26,9 +24,6 @@ if __name__ == '__main__':
                                         "Jake Kausler",
                                         homeland='Sas Arkan',
                                         growth=config.GROWTH_MEDIUM,
-                                        armor=None,
-                                        shield=None,
-                                        magicalProtection=None,
                                         languages=['Common', 'Sylvan', 'Gnome', 'Orc', 'Goblin', 'Giant', 'Celestial'],
                                         skills={
                                                 config.SKILL_ACROBATICS: [0, skill.SkillClasses[config.SKILL_ACROBATICS](config.SKILL_ACROBATICS)],
@@ -71,7 +66,6 @@ if __name__ == '__main__':
                                                 config.SKILL_USE_MAGIC_DEVICE: [0, skill.SkillClasses[config.SKILL_USE_MAGIC_DEVICE](config.SKILL_USE_MAGIC_DEVICE)]
                                         },
                                         inventory=None,
-                                        weapons=None,
                                         height=41,
                                         weight=43,
                                         hairColor=config.COLOR_BLUE,
@@ -91,8 +85,8 @@ if __name__ == '__main__':
                                         },
                                         race=race.Gnome(),
                                         classes=[
-                                                (characterclass.Cleric(char, 0), 5),
-                                                (characterclass.Sorcerer(char, 1), 1)
+                                                [characterclass.Cleric(char, 0), 5],
+                                                [characterclass.Sorcerer(char, 1), 1]
                                         ],
                                         hitDieMethod=config.HIT_DIE_AVERAGE
                                         )
@@ -120,7 +114,8 @@ if __name__ == '__main__':
     char.AddItem(item.Item("Mirror", 1, 10), 1)
     char.AddItem(item.Item("Wistle, signal", 0, 0.8), 1)
     char.AddItem(item.Item("Compass", 0.5, 10), 1)
-    char.AddItem(item.Item("Dagger", 1, 2), 1)
+    char.AddItem(item.MeleeWeapon("Dagger", 1, 2, config.NONE, damage=roll.Dice(4, 1), size=size.Small(), criticalRange=[19, 20], range=10, type=config.WEAPON_TYPE_PEIRCING|config.WEAPON_TYPE_SLASHING, typeJoin=config.JOIN_OR, isLight=True), 1)
+    char.Inventory.WearItem(17)
     char.AddItem(item.Item("Dragonclaw Brooch", 0, 0), 1)
     char.AddItem(item.Item("Code Book", 0, 0), 1)
     char.AddItem(item.Item("Codex", 0, 0), 1)

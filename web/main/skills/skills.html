@@ -1,4 +1,5 @@
 <span class="md-display-1">Skills</span><span ng-hide="character.SkillPointsLeft==0">(Can add {{character.SkillPointsLeft}} ranks)</span>
+<md-button ng-show="character.FavoredClassPointsLeft > 0" ng-click="showFCSkillDialog()">Apply FC Points</md-button>
 <md-content layout-padding>
 	<md-table-container>
 		<table style="width: 100%">

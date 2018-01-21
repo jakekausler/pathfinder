@@ -1,5 +1,6 @@
 
 import color
+import roll
 
 '''
 Misc
@@ -6569,6 +6570,101 @@ ITEM_SLOT_FEET = 11
 ITEM_SLOT_HEAD = 12
 ITEM_SLOT_HANDS = 13
 ITEM_SLOT_BODY = 14
+ITEM_SLOT_MAINHAND = 15
+ITEM_SLOT_OFFHAND = 16
+
+'''
+Weapon Damage Die Order.
+Medium Roll: [Tiny Roll, Small Roll, Large Roll]
+'''
+WeaponDamageDieOrder = {
+    roll.Dice(0, addition=1): [roll.Dice(0), roll.Dice(0), roll.Dice(2, 1)],
+    roll.Dice(2, 1): [roll.Dice(0), roll.Dice(1), roll.Dice(3, 1)],
+    roll.Dice(3, 1): [roll.Dice(1), roll.Dice(2, 1), roll.Dice(4, 1)],
+    roll.Dice(4, 1): [roll.Dice(2, 1), roll.Dice(3, 1), roll.Dice(6, 1)],
+    roll.Dice(6, 1): [roll.Dice(3, 1), roll.Dice(4, 1), roll.Dice(8, 1)],
+    roll.Dice(8, 1): [roll.Dice(4, 1), roll.Dice(6, 1), roll.Dice(6, 2)],
+    roll.Dice(10, 1): [roll.Dice(6, 1), roll.Dice(8, 1), roll.Dice(8, 2)],
+    roll.Dice(12, 1): [roll.Dice(8, 1), roll.Dice(10, 1), roll.Dice(6, 3)],
+    roll.Dice(4, 2): [roll.Dice(4, 1), roll.Dice(6, 1), roll.Dice(6, 2)],
+    roll.Dice(6, 2): [roll.Dice(8, 1), roll.Dice(10, 1), roll.Dice(6, 3)],
+    roll.Dice(8, 2): [roll.Dice(10, 1), roll.Dice(6, 2), roll.Dice(8, 3)],
+    roll.Dice(10, 2): [roll.Dice(6, 2), roll.Dice(8, 2), roll.Dice(8, 4)]
+}
+
+'''
+Weapons
+'''
+WEAPON_TYPE_BLUDGEONING = 0x1
+WEAPON_TYPE_SLASHING = 0x2
+WEAPON_TYPE_PEIRCING = 0x4
+
+WeaponTypeDict = {
+    'Bludgeoning': WEAPON_TYPE_BLUDGEONING,
+    'Slashing': WEAPON_TYPE_SLASHING,
+    'Peircing': WEAPON_TYPE_PEIRCING
+}
+
+WEAPON_SPECIAL_BLOCKING = 0x001
+WEAPON_SPECIAL_BRACE = 0x002
+WEAPON_SPECIAL_DEADLY = 0x004
+WEAPON_SPECIAL_DISARM = 0x008
+WEAPON_SPECIAL_DISTRACTING = 0x010
+WEAPON_SPECIAL_DOUBLE = 0x020
+WEAPON_SPECIAL_FRAGILE = 0x040
+WEAPON_SPECIAL_GRAPPLE = 0x080
+WEAPON_SPECIAL_MONK = 0x100
+WEAPON_SPECIAL_NONLETHAL = 0x200
+WEAPON_SPECIAL_PERFORMANCE = 0x400
+WEAPON_SPECIAL_REACH = 0x800
+WEAPON_SPECIAL_STRENGTH = 0x1000
+WEAPON_SPECIAL_SUNDER = 0x2000
+WEAPON_SPECIAL_TRIP = 0x4000
+
+WeaponSpecialDict = {
+    'Blocking': WEAPON_SPECIAL_BLOCKING,
+    'Brace': WEAPON_SPECIAL_BRACE,
+    'Deadly': WEAPON_SPECIAL_DEADLY,
+    'Disarm': WEAPON_SPECIAL_DISARM,
+    'Distracting': WEAPON_SPECIAL_DISTRACTING,
+    'Double': WEAPON_SPECIAL_DOUBLE,
+    'Fragile': WEAPON_SPECIAL_FRAGILE,
+    'Grapple': WEAPON_SPECIAL_GRAPPLE,
+    'Monk': WEAPON_SPECIAL_MONK,
+    'Nonlethal': WEAPON_SPECIAL_NONLETHAL,
+    'Performance': WEAPON_SPECIAL_PERFORMANCE,
+    'Reach': WEAPON_SPECIAL_REACH,
+    'Strength': WEAPON_SPECIAL_STRENGTH,
+    'Sunder': WEAPON_SPECIAL_SUNDER,
+    'Trip': WEAPON_SPECIAL_TRIP
+}
+
+AMMO_TYPE_ARROW = 1
+AMMO_TYPE_DART = 2
+AMMO_TYPE_BOLT = 3
+AMMO_TYPE_SLING_BULLET = 4
+AMMO_TYPE_SHURIKEN = 5
+
+AmmoTypeDict = {
+    'Arrow': AMMO_TYPE_ARROW,
+    'Dart': AMMO_TYPE_DART,
+    'Bolt': AMMO_TYPE_BOLT,
+    'Sling Bullet': AMMO_TYPE_SLING_BULLET,
+    'Shuriken': AMMO_TYPE_SHURIKEN
+}
+
+'''
+Armor
+'''
+ARMOR_LIGHT = 1
+ARMOR_MEDIUM = 2
+ARMOR_HEAVY = 3
+
+ArmorTypeDict = {
+    'Light': ARMOR_LIGHT,
+    'Medium': ARMOR_MEDIUM,
+    'Heavy': ARMOR_HEAVY
+}
 
 '''
 Join Types
@@ -6663,6 +6759,18 @@ SIZE_HUGE = 0x12
 SIZE_GARGANTUAN = 0x14
 SIZE_COLOSSAL = 0x18
 
+SizeTypeDict = {
+    SIZE_FINE: 'Fine',
+    SIZE_DIMINUTIVE: 'Diminutive',
+    SIZE_TINY: 'Tiny',
+    SIZE_SMALL: 'Small',
+    SIZE_MEDIUM: 'Medium',
+    SIZE_LARGE: 'Large',
+    SIZE_HUGE: 'Huge',
+    SIZE_GARGANTUAN: 'Gargantuan',
+    SIZE_COLOSSAL: 'Colossal'
+}
+
 SizeNameToId = {
     "Fine": SIZE_FINE,
     "Diminutive": SIZE_DIMINUTIVE,
@@ -6716,6 +6824,47 @@ SKILL_STEALTH = 35
 SKILL_SURVIVAL = 36
 SKILL_SWIM = 37
 SKILL_USE_MAGIC_DEVICE = 38
+
+SkillNameToId = {
+    "Acrobatics": SKILL_ACROBATICS,
+    "Appraise": SKILL_APPRAISE,
+    "Bluff": SKILL_BLUFF,
+    "Climb": SKILL_CLIMB,
+    "Craft1": SKILL_CRAFT1,
+    "Craft2": SKILL_CRAFT2,
+    "Diplomacy": SKILL_DIPLOMACY,
+    "Disable Device": SKILL_DISABLE_DEVICE,
+    "Disguise": SKILL_DISGUISE,
+    "Escape Artist": SKILL_ESCAPE_ARTIST,
+    "Fly": SKILL_FLY,
+    "Handle Animal": SKILL_HANDLE_ANIMAL,
+    "Heal": SKILL_HEAL,
+    "Intimidate": SKILL_INTIMIDATE,
+    "Knowledge Arcana": SKILL_KNOWLEDGE_ARCANA,
+    "Knowledge Dungeoneering": SKILL_KNOWLEDGE_DUNGEONEERING,
+    "Knowledge Engineering": SKILL_KNOWLEDGE_ENGINEERING,
+    "Knowledge Geography": SKILL_KNOWLEDGE_GEOGRAPHY,
+    "Knowledge History": SKILL_KNOWLEDGE_HISTORY,
+    "Knowledge Local": SKILL_KNOWLEDGE_LOCAL,
+    "Knowledge Nature": SKILL_KNOWLEDGE_NATURE,
+    "Knowledge Nobility": SKILL_KNOWLEDGE_NOBILITY,
+    "Knowledge Planes": SKILL_KNOWLEDGE_PLANES,
+    "Knowledge Religion": SKILL_KNOWLEDGE_RELIGION,
+    "Linguistics": SKILL_LINGUISTICS,
+    "Perception": SKILL_PERCEPTION,
+    "Perform1": SKILL_PERFORM1,
+    "Perform2": SKILL_PERFORM2,
+    "Prof1": SKILL_PROF1,
+    "Prof2": SKILL_PROF2,
+    "Ride": SKILL_RIDE,
+    "Sense Motive": SKILL_SENSE_MOTIVE,
+    "Sleight Of Hand": SKILL_SLEIGHT_OF_HAND,
+    "Spellcraft": SKILL_SPELLCRAFT,
+    "Stealth": SKILL_STEALTH,
+    "Survival": SKILL_SURVIVAL,
+    "Swim": SKILL_SWIM,
+    "Use Magic Device": SKILL_USE_MAGIC_DEVICE
+}
 
 '''
 Spells Known

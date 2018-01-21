@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import config
-import ability
 import roll
-import skill
 import spell
 
 
@@ -659,3 +657,179 @@ class Sorcerer(SpellcastingClass):
 
     def CanUseSpell(self, spLevel, spIdx, uses):
         return super(Sorcerer, self).CanUseSpell(self.KnownSpells[spLevel][spIdx], uses)
+
+
+class Bard(CharacterClass):
+    # TODO
+    Name = "Bard"
+    Type = config.CLASS_BARD
+
+    def __init__(self, character, characterClassIdx):
+        super(Bard, self).__init__(character, characterClassIdx)
+
+
+class Barbarian(CharacterClass):
+    # TODO
+    Name = "Barbarian"
+    Type = config.CLASS_BARBARIAN
+
+    def __init__(self, character, characterClassIdx):
+        super(Barbarian, self).__init__(character, characterClassIdx)
+
+
+class Druid(CharacterClass):
+    # TODO
+    Name = "Druid"
+    Type = config.CLASS_DRUID
+
+    def __init__(self, character, characterClassIdx):
+        super(Druid, self).__init__(character, characterClassIdx)
+
+
+class Rogue(CharacterClass):
+    # TODO
+    Name = "Rogue"
+    Type = config.CLASS_ROGUE
+
+    def __init__(self, character, characterClassIdx):
+        super(Rogue, self).__init__(character, characterClassIdx)
+
+
+class Fighter(CharacterClass):
+    # TODO
+    Name = "Fighter"
+    Type = config.CLASS_FIGHTER
+
+    def __init__(self, character, characterClassIdx):
+        super(Fighter, self).__init__(character, characterClassIdx)
+
+
+class Monk(CharacterClass):
+    # TODO
+    Name = "Monk"
+    Type = config.CLASS_MONK
+
+    def __init__(self, character, characterClassIdx):
+        super(Monk, self).__init__(character, characterClassIdx)
+
+
+class Paladin(CharacterClass):
+    # TODO
+    Name = "Paladin"
+    Type = config.CLASS_PALADIN
+
+    def __init__(self, character, characterClassIdx):
+        super(Paladin, self).__init__(character, characterClassIdx)
+
+
+class Ranger(CharacterClass):
+    # TODO
+    Name = "Ranger"
+    Type = config.CLASS_RANGER
+
+    def __init__(self, character, characterClassIdx):
+        super(Ranger, self).__init__(character, characterClassIdx)
+
+
+class Wizard(CharacterClass):
+    # TODO
+    Name = "Wizard"
+    Type = config.CLASS_WIZARD
+
+    def __init__(self, character, characterClassIdx):
+        super(Wizard, self).__init__(character, characterClassIdx)
+
+
+class Alchemist(CharacterClass):
+    # TODO
+    Name = "Alchemist"
+    Type = config.CLASS_ALCHEMIST
+
+    def __init__(self, character, characterClassIdx):
+        super(Alchemist, self).__init__(character, characterClassIdx)
+
+
+class Summoner(CharacterClass):
+    # TODO
+    Name = "Summoner"
+    Type = config.CLASS_SUMMONER
+
+    def __init__(self, character, characterClassIdx):
+        super(Summoner, self).__init__(character, characterClassIdx)
+
+
+class Witch(CharacterClass):
+    # TODO
+    Name = "Witch"
+    Type = config.CLASS_WITCH
+
+    def __init__(self, character, characterClassIdx):
+        super(Witch, self).__init__(character, characterClassIdx)
+
+
+class Inquisitor(CharacterClass):
+    # TODO
+    Name = "Inquisitor"
+    Type = config.CLASS_INQUISITOR
+
+    def __init__(self, character, characterClassIdx):
+        super(Inquisitor, self).__init__(character, characterClassIdx)
+
+
+class Oracle(CharacterClass):
+    # TODO
+    Name = "Oracle"
+    Type = config.CLASS_ORACLE
+
+    def __init__(self, character, characterClassIdx):
+        super(Oracle, self).__init__(character, characterClassIdx)
+
+
+class Antipaladin(CharacterClass):
+    # TODO
+    Name = "Antipaladin"
+    Type = config.CLASS_ANTIPALADIN
+
+    def __init__(self, character, characterClassIdx):
+        super(Antipaladin, self).__init__(character, characterClassIdx)
+
+
+class Magus(CharacterClass):
+    # TODO
+    Name = "Magus"
+    Type = config.CLASS_MAGUS
+
+    def __init__(self, character, characterClassIdx):
+        super(Magus, self).__init__(character, characterClassIdx)
+
+
+class Adept(CharacterClass):
+    # TODO
+    Name = "Adept"
+    Type = config.CLASS_ADEPT
+
+    def __init__(self, character, characterClassIdx):
+        super(Adept, self).__init__(character, characterClassIdx)
+
+
+ClassDict = {
+    config.CLASS_CLERIC: Cleric,
+    config.CLASS_BARD: Bard,
+    config.CLASS_BARBARIAN: Barbarian,
+    config.CLASS_DRUID: Druid,
+    config.CLASS_ROGUE: Rogue,
+    config.CLASS_FIGHTER: Fighter,
+    config.CLASS_MONK: Monk,
+    config.CLASS_PALADIN: Paladin,
+    config.CLASS_RANGER: Ranger,
+    config.CLASS_SORCERER: Sorcerer,
+    config.CLASS_WIZARD: Wizard,
+    config.CLASS_ALCHEMIST: Alchemist,
+    config.CLASS_SUMMONER: Summoner,
+    config.CLASS_WITCH: Witch,
+    config.CLASS_INQUISITOR: Inquisitor,
+    config.CLASS_ORACLE: Oracle,
+    config.CLASS_ANTIPALADIN: Antipaladin,
+    config.CLASS_MAGUS: Magus,
+    config.CLASS_ADEPT: Adept
+}

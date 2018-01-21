@@ -1,22 +1,18 @@
 <md-dialog aria-label="Class Dialog">
 	<md-dialog-content>
 		<span class="md-display-1">
-			{{className}} Level
+			Add Class
 		</span>
 		<md-input-container>
-			<label>Amount</label>
-			<input type="number" ng-model="amount">
+			<label>Class</label>
+			<md-select ng-model="classId" md-on-open="loadClasses()">
+				<md-option ng-repeat="type in classes" ng-value="type.Id">{{type.Name}}</md-option>
+			</md-select>
 		</md-input-container>
 	</md-dialog-content>
 	<md-dialog-buttons>
-		<md-button ng-click="save('increase')">
-			Increase
-		</md-button>
-		<md-button ng-click="save('decrease')">
-			Decrease
-		</md-button>
-		<md-button ng-click="save('remove')">
-			Remove Class
+		<md-button ng-disabled="classId < 0" ng-click="save()">
+			Add
 		</md-button>
 		<md-button ng-click="cancel()">
 			Cancel

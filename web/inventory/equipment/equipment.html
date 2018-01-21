@@ -3,12 +3,16 @@
 	<md-table-container>
 		<table style="width: 100%">
 			<tbody>
-				<tr ng-repeat="(key, value) in character.Inventory.Worn" ng-click="showEquipmentDialog(key, value)">
+				<tr ng-repeat="(key, value) in character.Inventory.Worn">
 					<td>
 						<span>{{key}}</span>
 					</td>
 					<td style='text-align: center'>
-						<span>{{value}}</span>
+						<span>{{value[1].Name}}</span>
+					</td>
+					<td style='text-align: center'>
+						<md-button ng-click="unequip($event, value[1])" ng-show="value[1] != null">Unequip</md-button>
+						<md-button ng-click="showEquipmentEquipDialog($event, value[0])" ng-show="value[1] == null">Equip</md-button>
 					</td>
 				</tr>
 			</tbody>

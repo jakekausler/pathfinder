@@ -1,17 +1,17 @@
 <md-dialog aria-label="Equip Dialog">
 	<md-dialog-content>
 		<span class="md-display-1">
-			Equip Item
+			Equip {{item.Name}}
 		</span>
 		<md-input-container>
-			<label>Item</label>
-			<md-select ng-model="itemid" md-on-open="loadEquipableItems()">
-				<md-option ng-repeat="type in items" ng-value="type[1]">{{type[0]}}</md-option>
+			<label>Slot</label>
+			<md-select ng-model="slot">
+				<md-option ng-repeat="type in item.PossibleLocations" ng-value="type[0]">{{type[1]}}</md-option>
 			</md-select>
 		</md-input-container>
 	</md-dialog-content>
 	<md-dialog-buttons>
-		<md-button ng-disabled="itemid < 0" ng-click="save()">
+		<md-button ng-disable="slot == 0" ng-click="save()">
 			Equip
 		</md-button>
 		<md-button ng-click="cancel()">

@@ -1,0 +1,194 @@
+<md-dialog aria-label="New Item Dialog">
+	<md-dialog-content>
+		<span class="md-display-1">
+			Add Item
+		</span>
+		<div layout="column">
+			<div layout="row">
+				<md-input-container>
+					<label>Name</label>
+					<input ng-model="name">
+				</md-input-container>
+				<md-input-container>
+					<label>Quantity</label>
+					<input type="number" ng-model="quantity">
+				</md-input-container>
+				<md-input-container>
+					<label>Value<span ng-show="itemType!='Item'"> (Without any modifiers)</span></label>
+					<input type="number" ng-model="value">
+				</md-input-container>
+				<md-input-container>
+					<label>Weight<span ng-show="itemType!='Item'"> (At medium size)</span></label>
+					<input type="number" ng-model="weight">
+				</md-input-container>
+			</div>
+			<div>
+				<md-input-container>
+					<label>Item Type</label>
+					<md-select ng-model="itemType">
+						<md-option ng-repeat="type in itemTypes" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container ng-show="itemType=='Weapon'">
+					<label>Weapon Type</label>
+					<md-select ng-model="weaponType">
+						<md-option ng-repeat="type in weaponTypes" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container ng-show="itemType=='Wearable'">
+					<label>Wearable Type</label>
+					<md-select ng-model="wearableType">
+						<md-option ng-repeat="type in wearableTypes" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container ng-show="itemType=='Ammunition'">
+					<label>Ammunition Type</label>
+					<md-select ng-model="ammoType">
+						<md-option ng-repeat="type in ammoTypes" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+			<div ng-show="itemType=='Weapon' && weaponType != ''">
+				<md-input-container>
+					<label>Damage (At medium size)</label>
+					<input ng-model="damage" dice>
+				</md-input-container>
+				<md-input-container>
+					<label>Critical</label>
+					<input ng-model="critical" crit>
+				</md-input-container>
+				<md-input-container>
+					<label>Range</label>
+					<input ng-model="range" type="number">
+				</md-input-container>
+				<md-input-container>
+					<label>Types</label>
+					<md-select ng-model="weaponAttackTypes" multiple>
+						<md-option ng-repeat="type in attackTypes" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-checkbox ng-show="weaponAttackTypes.length > 1" ng-model="usesAllTypes">Use All Types</md-checkbox>
+				<md-input-container>
+					<label>Specials</label>
+					<md-select ng-model="weaponSpecials" multiple>
+						<md-option ng-repeat="type in specials" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-checkbox ng-show="weaponSpecials.length > 1" ng-model="usesAllSpecials">Use All Specials</md-checkbox>
+				<md-checkbox ng-model="twoHanded">Two Handed</md-checkbox>
+				<md-checkbox ng-model="light">Light</md-checkbox>
+				<md-checkbox ng-model="martial">Martial</md-checkbox>
+				<md-checkbox ng-model="exotic">Exotic</md-checkbox>
+				<md-checkbox ng-model="masterwork">Masterwork</md-checkbox>
+				<md-input-container>
+					<label>Enchantment</label>
+					<input ng-model="enchantment" type="number">
+				</md-input-container>
+				<md-input-container>
+					<label>Size</label>
+					<md-select ng-model="size">
+						<md-option ng-repeat="type in sizes" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container ng-show="weaponType=='Ranged'">
+					<label>Ammunition Type</label>
+					<md-select ng-model="ammoType">
+						<md-option ng-repeat="type in ammoTypes" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container ng-show="weaponType=='Unarmed'">
+					<label>Applicable Slots</label>
+					<md-select ng-model="applicableSlots" multiple>
+						<md-option ng-repeat="(key, value) in parent.character.Inventory.Worn" ng-value="key">{{key}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container ng-show="weaponType=='Unarmed'">
+					<label>Cancels Slots</label>
+					<md-select ng-model="cancelsSlots" multiple>
+						<md-option ng-repeat="(key, value) in parent.character.Inventory.Worn" ng-value="key">{{key}}</md-option>
+					</md-select>
+				</md-input-container>
+			</div>
+			<div ng-show="itemType=='Wearable' && wearableType=='Armor' || wearableType=='Shield'">
+				<md-input-container>
+					<label>Weight Type</label>
+					<md-select ng-model="weightType">
+						<md-option ng-repeat="type in weightTypes" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container>
+					<label>Size</label>
+					<md-select ng-model="size">
+						<md-option ng-repeat="type in sizes" ng-value="type">{{type}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container>
+					<label>Armor Class</label>
+					<input ng-model="armorClass" type="number">
+				</md-input-container>
+				<md-input-container>
+					<label>Armor Check Penalty</label>
+					<input ng-model="armorCheckPenalty" type="number">
+				</md-input-container>
+				<md-input-container>
+					<label>Max Dex Bonus</label>
+					<input ng-model="maxDexBonus" type="number">
+				</md-input-container>
+				<md-input-container>
+					<label>Enchantment</label>
+					<input ng-model="enchantment" type="number">
+				</md-input-container>
+				<md-checkbox ng-model="masterwork">Masterwork</md-checkbox>
+			</div>
+			<div ng-show="itemType=='Wearable' && wearableType=='Magical Protection'">
+				<md-input-container>
+					<label>Applicable Slots</label>
+					<md-select ng-model="applicableSlots" multiple>
+						<md-option ng-repeat="(key, value) in parent.character.Inventory.Worn" ng-value="key">{{key}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container>
+					<label>Cancels Slots</label>
+					<md-select ng-model="cancelsSlots" multiple>
+						<md-option ng-repeat="(key, value) in parent.character.Inventory.Worn" ng-value="key">{{key}}</md-option>
+					</md-select>
+				</md-input-container>
+			</div>
+			<div ng-show="itemType=='Wearable' && wearableType=='Other'">
+				<md-input-container>
+					<label>Applicable Slots</label>
+					<md-select ng-model="applicableSlots" multiple>
+						<md-option ng-repeat="(key, value) in parent.character.Inventory.Worn" ng-value="key">{{key}}</md-option>
+					</md-select>
+				</md-input-container>
+				<md-input-container>
+					<label>Cancels Slots</label>
+					<md-select ng-model="cancelsSlots" multiple>
+						<md-option ng-repeat="(key, value) in parent.character.Inventory.Worn" ng-value="key">{{key}}</md-option>
+					</md-select>
+				</md-input-container>
+			</div>
+			<div ng-show="itemType=='Ammunition' && ammoType != ''">
+				<md-input-container>
+					<label>Extra Damage</label>
+					<input ng-model="extraDamage" dice>
+				</md-input-container>
+				<md-input-container>
+					<label>Extra Range</label>
+					<input ng-model="extraRange" type="number">
+				</md-input-container>
+				<md-input-container>
+					<label>Extra Attack</label>
+					<input ng-model="extraAttack" type="number">
+				</md-input-container>
+			</div>
+		</div>
+	</md-dialog-content>
+	<md-dialog-buttons>
+		<md-button ng-click="save()">
+			Save
+		</md-button>
+		<md-button ng-click="cancel()">
+			Cancel
+		</md-button>
+	</md-dialog-buttons>
+</md-dialog>

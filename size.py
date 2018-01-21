@@ -3,6 +3,7 @@ import config
 
 
 class Size:
+    ID = config.NONE
     Name = ""
     ArmorClass = 0
     CMB = 0
@@ -12,6 +13,7 @@ class Size:
 
 
 class Fine(Size):
+    ID = config.SIZE_FINE
     Name = "Fine"
     ArmorClass = 8
     CMB = -8
@@ -21,6 +23,7 @@ class Fine(Size):
 
 
 class Diminutive(Size):
+    ID = config.SIZE_DIMINUTIVE
     Name = "Diminutive"
     ArmorClass = 4
     CMB = -4
@@ -30,6 +33,7 @@ class Diminutive(Size):
 
 
 class Tiny(Size):
+    ID = config.SIZE_TINY
     Name = "Tiny"
     ArmorClass = 2
     CMB = -2
@@ -39,6 +43,7 @@ class Tiny(Size):
 
 
 class Small(Size):
+    ID = config.SIZE_SMALL
     Name = "Small"
     ArmorClass = 1
     CMB = -1
@@ -48,6 +53,7 @@ class Small(Size):
 
 
 class Medium(Size):
+    ID = config.SIZE_MEDIUM
     Name = "Medium"
     ArmorClass = 0
     CMB = 0
@@ -57,6 +63,7 @@ class Medium(Size):
 
 
 class Large(Size):
+    ID = config.SIZE_LARGE
     Name = "Large"
     ArmorClass = -1
     CMB = 1
@@ -66,6 +73,7 @@ class Large(Size):
 
 
 class Huge(Size):
+    ID = config.SIZE_HUGE
     Name = "Huge"
     ArmorClass = -2
     CMB = 2
@@ -75,6 +83,7 @@ class Huge(Size):
 
 
 class Gargantuan(Size):
+    ID = config.SIZE_GARGANTUAN
     Name = "Gargantuan"
     ArmorClass = -4
     CMB = 4
@@ -84,6 +93,7 @@ class Gargantuan(Size):
 
 
 class Colossal(Size):
+    ID = config.SIZE_COLOSSAL
     Name = "Colossal"
     ArmorClass = -8
     CMB = 8

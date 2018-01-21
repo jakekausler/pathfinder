@@ -43,8 +43,6 @@ class Race:
         self.HeightModifier = []  # List of roll type, indexed by gender
         self.BaseWeight = []  # List of Weight (in pounds), indexed by gender
         self.WeightModifier = []  # List of roll type, indexed by gender
-        self.WeaponProficiencies = []  # TODO
-        self.WeaponProficienciesNamed = []  # TODO
 
     def SetEffects(self, character):
         return
@@ -122,6 +120,14 @@ class Race:
             abilities[config.ABILITY_WISDOM] = 1
             abilities[config.ABILITY_CHARISMA] = 1
         return abilities
+
+    def IsMartialWeapon(self, item):
+        # TODO
+        return False
+
+    def IsProficient(self, item):
+        # TODO
+        return True
 
 
 class Dwarf(Race):

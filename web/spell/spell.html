@@ -4,7 +4,7 @@
 		<md-tab ng-repeat="class in character.Classes" label="{{class.Class.Type}}" ng-init="classIndex=$index" flex>
 			<md-content layout-padding flex>
 				<md-button ng-click="resetClass(classIndex)">Reset Class</md-button>
-				<div ng-hide="characterSpells[class.Class.Type][i].length == 0" ng-repeat="i in getNumberArray(10)">
+				<div ng-hide="character.Classes[$index].Class.SpellsPerDay[i] <= 0 && character.Classes[$index].Class.SpellsPerDay[i] != -999999999" ng-repeat="i in getNumberArray(10)">
 					<div>
 						<span class="md-display-1">Level {{i}}</br></span>
 						<span>Can cast {{class.Class.SpellsPerDay[i] == -999999999 ? '∞' : class.Class.SpellsPerDay[i]}} more spells</br></span>

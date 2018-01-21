@@ -2,9 +2,6 @@
 	 <thead>
 		<tr>
 			<th style='text-align: center'>
-				<span>Active</span>
-			</th>
-			<th style='text-align: center'>
 				<span>Name</span>
 			</th>
 			<th style='text-align: center'>
@@ -22,10 +19,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="w in character.MagicalProtection" ng-click="showMagicalProtectiveDialog(w)">
-			<td style='text-align: center'>
-				<span>{{w.Active}}</span>
-			</td>
+		<tr ng-repeat="w in character.MagicalProtection">
 			<td>
 				<span>{{w.MagicalProtection.Name}}</span>
 			</td>
@@ -37,26 +31,6 @@
 			</td>
 			<td style='text-align: center'>
 				<span>{{w.MagicalProtection.Bonus}}</span>
-			</td>
-		</tr>
-		<tr ng-click="showMagicalProtectiveDialog(-1)">
-			<td>
-				<span>&nbsp;</span>
-			</td>
-			<td>
-				<span>&nbsp;</span>
-			</td>
-			<td style='text-align: center'>
-				<span>&nbsp;</span>
-			</td>
-			<td style='text-align: center'>
-				<span>&nbsp;</span>
-			</td>
-			<td style='text-align: center'>
-				<span>&nbsp;</span>
-			</td>
-			<td style='text-align: center'>
-				<span>&nbsp;</span>
 			</td>
 		</tr>
 	</tbody>

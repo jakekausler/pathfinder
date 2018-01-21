@@ -35,3 +35,33 @@ class Dice:
 
     def RollAverage(self):
         return math.ceil((self.sides+1)/2.0) * self.numRolls * self.multiplier + self.addition
+
+    def Copy(self):
+        return Dice(self.sides, self.numRolls, self.multiplier, self.addition)
+
+    def __eq__(self, other):
+        return (
+            self.sides == other.sides and
+            self.numRolls == other.numRolls and
+            self.multiplier == other.multiplier and
+            self.addition == other.addition
+            )
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return hash(self.ToJson())
+
+    def ToJson(self):
+        base = str(self.numRolls) + "d" + str(self.sides)
+        if base.startswith("0d"):
+            base = ""
+        extra = str(self.addition)
+        if extra == "0":
+            extra = ""
+        if extra == "":
+            return base
+        if base == "":
+            return extra
+        return base + "+" + extra
